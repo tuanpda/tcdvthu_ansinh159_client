@@ -1718,7 +1718,7 @@ export default {
       tylenngansachdp: 0,
       tyledongbhyt: 0,
       chuanngheo: 0,
-      tylediaphuonghotroIs: 0,
+      tylediaphuonghotroIs: 10, // hiện tại là đang để 0
       tylehotrokhacIs: 0,
       hotrokhac: 0,
       matinh: "",
@@ -2480,6 +2480,8 @@ export default {
 
     // Đối tượng đóng - IS - TÍNH TIỀN LUÔN
     async doituongChange(e, index) {
+      console.log(this.tylediaphuonghotroIs);
+
       const madoituong = e.target.value;
       const tendoituong = e.target.options[e.target.selectedIndex].text;
       this.items[index].madoituong = madoituong;
@@ -2490,15 +2492,21 @@ export default {
       );
 
       let castMucdong = mucDong * (this.tyledongbhyt / 100);
+
       let castSubTwhotro = this.chuanngheo * (this.tyledongbhyt / 100);
+
       let castDiaphuonght =
         this.chuanngheo *
         (this.tyledongbhyt / 100) *
         (this.tylediaphuonghotroIs / 100);
+      console.log("tiền ngân sách địa phương hỗ trợ:", castDiaphuonght);
+
       let castDiaphuonghtKhac =
         this.chuanngheo *
         (this.tyledongbhyt / 100) *
         (this.tylehotrokhacIs / 100);
+
+      console.log("tiền ngân sách địa phương hỗ trợ khác:", castDiaphuonght);
 
       if (this.items[index].madoituong === "BT") {
         let madoituong = "";
@@ -2506,6 +2514,11 @@ export default {
           const doituong = this.doituongdong[i];
           // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
           if (doituong.madoituong === "BT") {
+            console.log(
+              "tỷ lệ hỗ trợ của trung ương của BT: ",
+              doituong.tylehotro
+            );
+
             madoituong = doituong.tylehotro;
           }
         }
@@ -2526,6 +2539,10 @@ export default {
           const doituong = this.doituongdong[i];
           // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
           if (doituong.madoituong === "CN") {
+            console.log(
+              "tỷ lệ hỗ trợ của trung ương của BT: ",
+              doituong.tylehotro
+            );
             madoituong = doituong.tylehotro;
           }
         }
@@ -2545,6 +2562,10 @@ export default {
           const doituong = this.doituongdong[i];
           // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
           if (doituong.madoituong === "N") {
+            console.log(
+              "tỷ lệ hỗ trợ của trung ương của BT: ",
+              doituong.tylehotro
+            );
             madoituong = doituong.tylehotro;
           }
         }
