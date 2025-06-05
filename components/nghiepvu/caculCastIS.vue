@@ -54,7 +54,7 @@
               <td style="text-align: center">Tỉnh / Thành phố</td>
               <td style="text-align: center">Quận / Huyện</td>
               <td style="text-align: center">Xã phường</td>
-              <!-- <td style="text-align: center">Tổ thôn</td> -->
+              <td style="text-align: center">Tổ thôn</td>
               <td style="text-align: center">Hình thức nạp</td>
               <td style="text-align: center">Ghi chú</td>
               <!-- <td style="text-align: center">Số biên lai</td>
@@ -438,14 +438,14 @@
                 </div>
               </td>
               <!-- tổ thôn -->
-              <!-- <td style="text-align: center">
+              <td style="text-align: center">
                 <input
                   v-model="item.tothon"
                   class="input is-small"
                   type="text"
                   ref="tothonInput"
                 />
-              </td> -->
+              </td>
 
               <td>
                 <div class="select is-fullwidth is-small">
@@ -454,9 +454,6 @@
                     @change="hinhthucNap($event, index)"
                     ref="hinhthucnapInput"
                   >
-                    <option disabled value="">
-                      - Chọn hình thức nạp tiền -
-                    </option>
                     <option value="0">Tiền mặt</option>
                     <option value="1">Chuyển khoản</option>
                   </select>
@@ -1320,12 +1317,9 @@
                     <div class="select is-fullwidth is-small">
                       <select
                         @change="hinhthucNap($event, addedIndex)"
-                        v-model="selectedOptionHtnt"
+                        v-model="datanhaphosomodal.hinhthucnap"
                         ref="hinhthucnapInput"
                       >
-                        <option disabled selected>
-                          - Chọn hình thức nạp tiền -
-                        </option>
                         <option value="0">Tiền mặt</option>
                         <option value="1">Chuyển khoản</option>
                       </select>
@@ -1947,7 +1941,7 @@ export default {
 
         try {
           const res = await this.$axios.get(
-            `/api/nguoihuong/find-nguoihuong-masobhxh-theodstg?soBhxh=${masobhxh}`
+            `/api/nguoihuong/find-nguoihuong-masobhxh-theodstg-timhanthe?soSoBhxh=${masobhxh}`
           );
           this.isLoading = true;
           // console.log(res.data);
@@ -1973,34 +1967,94 @@ export default {
             try {
               this.items[index].hoten = data.hoTen;
               this.items[index].ngaysinh = data.ngaySinh;
-              this.items[index].gioitinh = data.gioiTinh;
-              this.items[index].cccd = data.soCmnd;
+              // console.log(typeof data.gioiTinh);
+              if (data.gioiTinh == "1") {
+                this.items[index].gioitinh = "Nam";
+              } else {
+                this.items[index].gioitinh = "Nữ";
+              }
               this.items[index].dienthoai = data.soDienThoai;
-              this.items[index].matinh = data.maTinh;
+
+              // CODE TÌM HẠN THẺ TỪ 05/06/2025
+              // gán hạn thẻ cũ lên form
+              this.hanthecu = data.denNgay;
+              const denNgayStr = data.denNgay; // vd: "10/10/2024"
+              // const denNgayStr = "15/03/2025";
+
+              // Hàm parse định dạng dd/mm/yyyy thành Date
+              const parseDate = (str) => {
+                const [day, month, year] = str.split("/").map(Number);
+                return new Date(year, month - 1, day);
+              };
+
+              // Hàm format Date về dd/mm/yyyy
+              const formatDate = (date) => {
+                const d = String(date.getDate()).padStart(2, "0");
+                const m = String(date.getMonth() + 1).padStart(2, "0");
+                const y = date.getFullYear();
+                return `${d}/${m}/${y}`;
+              };
+
+              const today = new Date();
+              const denNgay = parseDate(denNgayStr);
+              const bienLai = today;
+
+              // console.log("đến ngày: ", denNgay);
+              // console.log("biên lai: ", bienLai);
+
+              let tuNgay;
+
+              if (denNgay >= today) {
+                // Chưa hết hạn → ngày kế tiếp
+                const nextDay = new Date(denNgay);
+                nextDay.setDate(nextDay.getDate() + 1);
+                tuNgay = nextDay;
+              } else {
+                const daysDiff = (today - denNgay) / (1000 * 60 * 60 * 24);
+                if (daysDiff > 90) {
+                  // Hết hạn > 3 tháng → sau hôm nay 30 ngày
+                  const next30 = new Date();
+                  next30.setDate(next30.getDate() + 30);
+                  tuNgay = next30;
+                } else {
+                  // Hết hạn < 3 tháng → dùng ngày biên lai
+                  tuNgay = bienLai;
+                }
+              }
+
+              this.items[index].tungay = formatDate(tuNgay);
+              // console.log("🎯 Hạn thẻ từ (tungay):", this.items[index].tungay);
+
+              this.items[index].matinh = data.maTinhLh;
               // đi tìm tên tỉnh
               const res_tinh = await this.$axios.get(
-                `/api/nguoihuong/find-tentinh?matinh=${data.maTinh}`
+                `/api/nguoihuong/find-tentinh?matinh=${data.maTinhLh}`
               );
               if (res_tinh.data.length > 0) {
                 this.items[index].tentinh = res_tinh.data[0].tentinh;
+                // console.log(this.items[index].tentinh);
               }
               this.items[index].maquanhuyen = data.maHuyenLh;
               // đi tìm tên quận huyện
               const res_huyen = await this.$axios.get(
-                `/api/nguoihuong/find-tenhuyen?matinh=${data.maTinh}&maquanhuyen=${data.maHuyenLh}`
+                `/api/nguoihuong/find-tenhuyen?matinh=${data.maTinhLh}&maquanhuyen=${data.maHuyenLh}`
               );
               if (res_huyen.data.length > 0) {
                 this.items[index].tenquanhuyen = res_huyen.data[0].tenquanhuyen;
+                // console.log(this.items[index].tenquanhuyen);
               }
               this.items[index].maxaphuong = data.maXaLh;
               // đi tìm tên xã
               const res_xa = await this.$axios.get(
-                `/api/nguoihuong/find-tenxa?matinh=${data.maTinh}&maquanhuyen=${data.maHuyenLh}&maxaphuong=${data.maXaLh}`
+                `/api/nguoihuong/find-tenxa?matinh=${data.maTinhLh}&maquanhuyen=${data.maHuyenLh}&maxaphuong=${data.maXaLh}`
               );
+              // console.log(res_xa);
+
               if (res_xa.data.length > 0) {
                 this.items[index].tenxaphuong = res_xa.data[0].tenxaphuong;
+                // console.log(this.items[index].tenxaphuong);
               }
-              this.items[index].tothon = data.diaChiLh;
+              this.items[index].tothon = data.diaChi;
               this.items[index].benhvientinh = data.maTinh;
               // this.items[index].mabenhvien = data.NoiKhamChuaBenh;
               // đi tìm tên bệnh viện kcb
@@ -2388,6 +2442,7 @@ export default {
 
           status_hosoloi: 0,
           status_naptien: 0,
+          hinhthucnap: 1,
         });
 
         // console.log(this.items);
