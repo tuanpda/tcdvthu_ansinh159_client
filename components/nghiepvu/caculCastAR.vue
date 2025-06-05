@@ -3328,6 +3328,18 @@ export default {
       console.log("bưc2");
       // Thêm ảnh vào PDF
       doc.addImage(backgroundImage, "PNG", x, y, imageWidth, imageHeight);
+      const img = new Image();
+      img.src = "path/to/image.png"; // hoặc base64 string
+
+      img.onload = () => {
+        console.log("✅ Ảnh đã load xong");
+        doc.addImage(img, "PNG", x, y, imageWidth, imageHeight);
+        console.log("➡️ Đã add image");
+      };
+
+      img.onerror = (err) => {
+        console.error("❌ Lỗi load ảnh:", err);
+      };
       console.log("bưc3");
       // add the font to jsPDF
       doc.addFont("OpenSans-Bold-normal.ttf", "OpenSans-Bold", "bold");
