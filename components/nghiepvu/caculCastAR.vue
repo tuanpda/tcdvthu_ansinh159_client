@@ -1695,6 +1695,21 @@ import "vue2-datepicker/index.css";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
+import jsPDF from "jspdf";
+import "~/assets/font/OpenSans-Light-normal";
+import "~/assets/font/OpenSans-SemiBold-normal";
+import "~/assets/font/OpenSans-Bold-normal";
+import "~/assets/font/OpenSans_SemiCondensed-Italic-normal";
+import "~/assets/font/OpenSans-ExtraBold-normal";
+import "~/assets/font/OpenSans_Condensed-Bold-normal";
+import "~/assets/font/OpenSans-Regular-normal";
+import "~/assets/font/font-times-new-roman-normal";
+import "~/assets/font/Times New Roman Bold-normal";
+import backgroundImage from "~/assets/images/bhxh.png";
+import qrcode from "~/assets/images/QR-BHXH.png";
+
+import num2words from "vn-num2words";
+
 export default {
   name: "calCastAR",
   mixins: [mixinDmBhxh],
@@ -3245,37 +3260,37 @@ export default {
 
             // console.log(dataKekhai);
 
-            const result = await this.$axios.post(
-              `/api/kekhai/add-kekhai-series`,
-              dataKekhai
-            );
+            // const result = await this.$axios.post(
+            //   `/api/kekhai/add-kekhai-series`,
+            //   dataKekhai
+            // );
 
-            console.log(result);
+            // console.log(result);
 
-            if (result.status === 200) {
-              let bodyRes = {};
-              console.log("xx", result.data.datares);
+            // if (result.status === 200) {
+            //   let bodyRes = {};
+            //   console.log("xx", result.data.datares);
 
-              bodyRes = result.data.datares;
-              // console.log(bodyRes);
-              bodyRes._id = data._id;
+            //   bodyRes = result.data.datares;
+            //   // console.log(bodyRes);
+            //   bodyRes._id = data._id;
 
-              const resUpdate = await this.$axios.post(
-                `/api/kekhai/updatestatushoso`,
-                bodyRes
-              );
+            //   const resUpdate = await this.$axios.post(
+            //     `/api/kekhai/updatestatushoso`,
+            //     bodyRes
+            //   );
 
-              Swal.fire({
-                title: "Kê khai thành công hồ sơ!",
-                // text: "Đã gửi thông tin hồ sơ lên cổng BHXH VN!",
-                icon: "success",
-              });
+            //   Swal.fire({
+            //     title: "Kê khai thành công hồ sơ!",
+            //     // text: "Đã gửi thông tin hồ sơ lên cổng BHXH VN!",
+            //     icon: "success",
+            //   });
 
-              this.isLoading = false;
-              this.isActive_xacnhan = false;
-              this.isActive = true;
-              this.items = [];
-            }
+            //   this.isLoading = false;
+            //   this.isActive_xacnhan = false;
+            //   this.isActive = true;
+            //   this.items = [];
+            // }
           } catch (error) {
             // console.log(error);
             this.isLoading = false;
@@ -3285,7 +3300,7 @@ export default {
     },
 
     async inBienLaiDientu(data) {
-      // console.log(data);
+      console.log(data);
 
       // const res = await this.$axios(
       //   `/api/kekhai/bienlaidientu?_id_hskk=${item._id}&hosoIdentity=${item.hosoIdentity}`
@@ -3310,10 +3325,10 @@ export default {
       // Tính tọa độ để ảnh nằm chính giữa trang
       const x = (pageWidth - imageWidth) / 2; // Căn giữa theo chiều ngang
       const y = (pageHeight - imageHeight) / 2; // Căn giữa theo chiều dọc
-
+      console.log("bưc2");
       // Thêm ảnh vào PDF
       doc.addImage(backgroundImage, "PNG", x, y, imageWidth, imageHeight);
-
+      console.log("bưc3");
       // add the font to jsPDF
       doc.addFont("OpenSans-Bold-normal.ttf", "OpenSans-Bold", "bold");
       doc.setFont("OpenSans-Bold", "bold");
@@ -3396,7 +3411,7 @@ export default {
       doc.text(`${data.ngaybienlai}`, 165, 50, {
         fontWeight: "bold",
       });
-
+      console.log("buoc2");
       // const dateTimeString = data.ngaybienlai;
       // // Tách chuỗi ngày tháng theo định dạng
       // const parts = dateTimeString.split(" ")[0].split("-"); // Lấy phần ngày và tách theo dấu "-"
@@ -3613,6 +3628,8 @@ export default {
 
       // Lưu file PDF trên một tab mới
       const tenbienlai = `${data.sobienlai}_${data.hoTen}`;
+      console.log(tenbienlai);
+
       // doc.output("dataurlnewwindow");
       // window.open(pdfURL, tenbienlai);
       // doc.save("a4.pdf");
