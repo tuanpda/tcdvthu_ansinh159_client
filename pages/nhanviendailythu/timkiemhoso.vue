@@ -197,6 +197,7 @@
                 <td rowspan="2" style="text-align: center; width: 3%">STT</td>
                 <td rowspan="2" style="text-align: center">_ID</td>
                 <td style="text-align: center">Trạng thái</td>
+                <td style="text-align: center">Biên lai</td>
                 <td rowspan="2" style="text-align: center">Số hồ sơ</td>
                 <td rowspan="2" style="text-align: center">Mã đại lý</td>
                 <td rowspan="2" style="text-align: center">Tên đại lý</td>
@@ -255,6 +256,13 @@
                       >
                     </template>
                   </template>
+                </td>
+                <td style="text-align: center">
+                  <a @click="xemBienLai(item)">
+                    <span style="color: #ff69b4" class="icon is-small is-left">
+                      <i class="fas fa-print"></i>
+                    </span>
+                  </a>
                 </td>
                 <td style="text-align: center">{{ item.sohoso }}</td>
                 <td style="text-align: center">{{ item.madaily }}</td>
@@ -1117,17 +1125,22 @@ export default {
     },
 
     async xemBienLai(item) {
+      // console.log(item.hosoIdentity);
+
       try {
         const res = await this.$axios.get(
           `/api/kekhai/view-item-bienlai?hosoIdentity=${item.hosoIdentity}`
         );
 
+        // console.log(res);
+
         const hs = res.data.hs;
-        if (hs && hs.sobienlai && hs.hoten) {
+        if (hs && hs.urlNameInvoice) {
           const fileName = `${hs.sobienlai}_${encodeURIComponent(
             hs.hoten
           )}.pdf`;
-          const pdfUrl = `http://27.73.37.94:4042/bienlaidientu/${fileName}`;
+          const pdfUrl = `http://14.224.129.177:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          // const pdfUrl = `http://localhost:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
           // console.log(pdfUrl);
 
           window.open(pdfUrl, "_blank");

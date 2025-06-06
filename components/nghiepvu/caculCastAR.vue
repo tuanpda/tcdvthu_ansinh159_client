@@ -3208,22 +3208,6 @@ export default {
               const currentYear = new Date().getFullYear();
               // console.log(currentYear);
 
-              const getCurrentSobienlai = await this.$axios.get(
-                `/api/kekhai/sobienlai?namtaichinh=${currentYear}`
-              );
-              // console.log(getCurrentSobienlai.data.bienlai);
-              let maxInvoiceStr = getCurrentSobienlai.data.bienlai || null;
-
-              let nextInvoice = "";
-
-              if (!maxInvoiceStr) {
-                // Nếu chưa có biên lai năm nay → bắt đầu từ 0000001
-                nextInvoice = "0000001";
-              } else {
-                const nextNumber = parseInt(maxInvoiceStr, 10) + 1;
-                nextInvoice = String(nextNumber).padStart(7, "0");
-              }
-
               // console.log(nextInvoice);
 
               // console.log(this.items[i].sotien);
@@ -3231,6 +3215,12 @@ export default {
                 this.items[i].sotien.replace(/,/g, ""),
                 10
               );
+
+              // lấy tên biên lai để lưu
+              const formattedForFilename = formattedDate.replace(/[-: ]/g, "_");
+              const urlNameInvoice = `${this.items[i].hosoIdentity}_${formattedForFilename}_${this.items[i].hoten}`;
+
+              // console.log(urlNameInvoice);
 
               const dataPost = {
                 hosoIdentity: this.items[i].hosoIdentity,
@@ -3251,13 +3241,14 @@ export default {
                 maDaiLy: this.items[i].madaily,
                 tenDaiLy: this.items[i].tendaily,
                 createdBy: this.user.username,
-                sobienlai: nextInvoice,
+                sobienlai: "",
                 ngaybienlai: formattedDate,
                 maloaihinh: this.items[i].maloaihinh,
                 tothon: this.items[i].tothon,
                 tenquanhuyen: this.items[i].tenquanhuyen,
                 tentinh: this.items[i].tentinh,
                 currentYear: currentYear,
+                urlNameInvoice: urlNameInvoice,
               };
 
               const ghibienlai = await this.$axios.post(
@@ -3637,22 +3628,8 @@ export default {
       // );
 
       // Lưu file PDF trên một tab mới
-      const now = new Date();
 
-      const pad = (num) => num.toString().padStart(2, "0");
-
-      const day = pad(now.getDate());
-      const month = pad(now.getMonth() + 1); // Tháng bắt đầu từ 0
-      const yearNow = now.getFullYear();
-
-      const hours = pad(now.getHours());
-      const minutes = pad(now.getMinutes());
-      const seconds = pad(now.getSeconds());
-
-      const addnameBL = `${day}_${month}_${yearNow}_${hours}_${minutes}_${seconds}`;
-
-      // const tenbienlai = `${ngayBL}_${data.sobienlai}_${data.hoTen}`;
-      const tenbienlai = `${addnameBL}_${data.sobienlai}_${data.hoTen}`;
+      const tenbienlai = data.urlNameInvoice;
       // console.log(tenbienlai);
 
       // doc.output("dataurlnewwindow");
