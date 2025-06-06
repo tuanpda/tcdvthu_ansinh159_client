@@ -161,7 +161,17 @@
               <span class="icon">
                 <i class="fab fa-amazon-pay"></i>
               </span>
-              <span>Xác nhận hồ sơ</span>
+              <span>PHÊ duyệt hồ sơ</span>
+            </button>
+
+            <button
+              @click="xacHUYNhanBienLai()"
+              class="button is-small is-warning"
+            >
+              <span class="icon">
+                <i class="fab fa-amazon-pay"></i>
+              </span>
+              <span>HUỶ duyệt hồ sơ</span>
             </button>
 
             <ExportExcel_Viettel :data_execl="data_kekhai" />
@@ -228,13 +238,22 @@
                 <td style="text-align: center">{{ index + 1 }}</td>
                 <td style="">{{ item._id }}</td>
                 <td style="text-align: center">
-                  <template v-if="item.status_naptien == 1"
-                    ><span style="font-weight: 700; color: #00947e"
-                      >Đã duyệt</span
+                  <template v-if="item.trangthai === 1">
+                    <span style="font-weight: 700; color: #ffc107"
+                      >Đã huỷ duyệt</span
                     ></template
                   >
-                  <template v-else="item.status_hosoloi == 1">
-                    <span style="font-weight: 800; color: red">Chưa duyệt</span>
+                  <template v-else>
+                    <template v-if="item.status_naptien == 1">
+                      <span style="font-weight: 700; color: #00947e"
+                        >Đã duyệt</span
+                      >
+                    </template>
+                    <template v-else>
+                      <span style="font-weight: 700; color: #dc3545"
+                        >Chưa duyệt</span
+                      >
+                    </template>
                   </template>
                 </td>
                 <td style="text-align: center">{{ item.sohoso }}</td>
@@ -331,7 +350,7 @@
         </div>
       </div>
 
-      <!-- modal xuất file execl -->
+      <!-- modal dữ liệu đã duyệt -->
       <div class="">
         <div :class="{ 'is-active': isActive }" class="modal">
           <div class="modal-background"></div>
@@ -339,7 +358,7 @@
             <section class="modal-card-body">
               <div>
                 <span style="font-weight: 800; font-size: 15px; color: #3cb371"
-                  >Chi tiết hồ sơ kê khai</span
+                  >Báo cáo trạng thái DUYỆT hồ sơ</span
                 >
               </div>
               <div style="text-align: end">
@@ -351,47 +370,25 @@
                 </button>
               </div>
 
-              <div>
-                <div class="titleKk">
-                  <hr class="line" />
-                  <div class="topleft">
-                    <span style="color: red; font-weight: 700">1.</span> Danh
-                    sách
-                  </div>
-                </div>
-                <div class="table_wrapper">
+              <div style="margin-top: 10px">
+                <div v-if="dulieuPheduyet.length > 0" class="table_wrapper">
                   <table
                     class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
                   >
                     <thead style="font-weight: bold">
                       <tr style="font-size: small; background-color: #fff8dc">
-                        <td style="text-align: center; width: 3%">STT</td>
+                        <td style="text-align: center; width: 3%">_ID HS</td>
                         <td style="text-align: center">Mã số BHXH</td>
                         <td style="text-align: center">Họ tên</td>
-                        <td style="text-align: center">Ngày sinh</td>
-                        <td style="text-align: center">Giới tính</td>
-                        <td style="text-align: center">CCCD</td>
-                        <td style="text-align: center">Điện thoại</td>
-                        <td style="text-align: center">Phương án</td>
-                        <td style="text-align: center">Lương cơ sở</td>
-                        <td style="text-align: center">Tỷ lệ NSTW %</td>
-                        <td style="text-align: center">Tỷ lệ NSĐP %</td>
-                        <td style="text-align: center">Tỷ lệ HT khác</td>
-                        <td style="text-align: center">Từ ngày</td>
-                        <td style="text-align: center">Số tháng</td>
-                        <td style="text-align: center">Số tiền phải đóng</td>
-                        <td style="text-align: center">Tỉnh / Thành phố</td>
-                        <td style="text-align: center">Quận / Huyện</td>
-                        <td style="text-align: center">Xã phường</td>
-                        <td style="text-align: center">Tổ thôn</td>
-                        <td style="text-align: center">Bệnh viện tỉnh</td>
-                        <td style="text-align: center">Bệnh viện</td>
-                        <td style="text-align: center">Ghi chú</td>
+                        <td style="text-align: center">
+                          Trạng thái gửi Phê duyệt vào hệ thống
+                        </td>
+                        <td style="text-align: center">Lỗi (nếu có)</td>
                       </tr>
                     </thead>
                     <tbody>
                       <tr
-                        v-for="(item, index) in data_xuatmau"
+                        v-for="(item, index) in dulieuPheduyet"
                         :key="index"
                         style="font-size: small"
                       >
@@ -405,114 +402,14 @@
                           {{ item.hoten }}
                         </td>
                         <td style="text-align: center">
-                          {{ item.ngaysinh }}
+                          {{ item.status }}
                         </td>
                         <td style="text-align: center">
-                          {{ item.gioitinh }}
-                        </td>
-                        <td style="text-align: center; font-weight: 500">
-                          {{ item.cccd }}
-                        </td>
-                        <td style="text-align: center; font-weight: 500">
-                          {{ item.dienthoai }}
-                        </td>
-                        <td style="text-align: center">
-                          {{ item.tenphuongan }}
-                        </td>
-                        <td style="text-align: center">
-                          {{ formatCurrency(item.tienluongcs) }}
-                        </td>
-                        <td style="text-align: center">
-                          {{ item.tylensnnht }}
-                        </td>
-                        <td style="text-align: center">
-                          {{ item.tylensdp }}
-                        </td>
-                        <td style="text-align: center">
-                          {{ item.hotrokhac }}
-                        </td>
-                        <td style="text-align: center">
-                          {{ item.tungay }}
-                        </td>
-                        <td style="text-align: center">
-                          {{ item.tenphuongthucdong }}
-                        </td>
-                        <td
-                          style="
-                            text-align: center;
-                            font-weight: 500;
-                            color: red;
-                          "
-                        >
-                          {{ formatCurrency(item.sotien) }}
-                        </td>
-                        <!-- tỉnh-->
-                        <td style="text-align: center">
-                          {{ item.tentinh }}
-                        </td>
-                        <!-- quận huyện -->
-                        <td style="text-align: center">
-                          {{ item.tenquanhuyen }}
-                        </td>
-                        <!-- xã phường -->
-                        <td>
-                          {{ item.tenxaphuong }}
-                        </td>
-                        <!-- tổ thôn -->
-                        <td>
-                          {{ item.tothon }}
-                        </td>
-                        <!-- tỉnh bệnh viện -->
-                        <td style="text-align: center">
-                          {{ item.benhvientinh }}
-                        </td>
-                        <!-- bệnh viện -->
-                        <td>
-                          {{ item.tenbenhvien }}
-                        </td>
-                        <!-- ghi chú -->
-                        <td>
-                          {{ item.ghichu }}
+                          {{ item.error }}
                         </td>
                       </tr>
                     </tbody>
                   </table>
-                </div>
-                <div class="titleKk">
-                  <hr class="line" />
-                  <div class="topleft">
-                    <span style="color: red; font-weight: 700">2.</span> Tổng số
-                    tiền phải nạp:
-                    <span style="color: red; font-weight: 700">{{
-                      formatCurrency(totalSoTien)
-                    }}</span>
-                  </div>
-                </div>
-                <hr class="navbar-divider" />
-                <div class="columns">
-                  <div class="column" style="margin-top: 10px">
-                    <div
-                      class="field is-grouped is-flex is-justify-content-center"
-                    >
-                      <div v-if="isVtVnpt == true" class="control">
-                        <ExportExcel_Viettel :data_execl="data_xuatmau" />
-                      </div>
-                      <div v-else class="control">
-                        <ExportExcel_Vnpt :data_execl="data_xuatmau" />
-                      </div>
-                      <div class="control">
-                        <button
-                          @click="isActive = false"
-                          class="button is-small is-danger"
-                        >
-                          <span class="icon">
-                            <i class="fas fa-power-off"></i>
-                          </span>
-                          <span>Thoát</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </section>
@@ -520,15 +417,15 @@
         </div>
       </div>
 
-      <!-- modal fix hồ sơ -->
+      <!-- modal dữ liệu huỷ duyệt -->
       <div class="">
         <div :class="{ 'is-active': isActive_fix }" class="modal">
           <div class="modal-background"></div>
-          <div class="modal-content modal-card-fix-hoso box">
-            <section class="modal-card-fix-hoso-body">
+          <div class="modal-content modal-card box">
+            <section class="modal-card-body">
               <div>
                 <span style="font-weight: 800; font-size: 15px; color: #3cb371"
-                  >Chỉnh sửa hồ sơ</span
+                  >Báo cáo trạng thái HUỶ duyệt hồ sơ</span
                 >
               </div>
               <div style="text-align: end">
@@ -540,13 +437,48 @@
                 </button>
               </div>
 
-              <!-- Hiển thị component editAR -->
-              <editAR
-                v-if="selectedItem"
-                :hoso="selectedItem"
-                :key="editKey"
-                @close="closeModal"
-              />
+              <div style="margin-top: 10px">
+                <div v-if="dulieuHuyPheDuyet.length > 0" class="table_wrapper">
+                  <table
+                    class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+                  >
+                    <thead style="font-weight: bold">
+                      <tr style="font-size: small; background-color: #fff8dc">
+                        <td style="text-align: center; width: 3%">_ID HS</td>
+                        <td style="text-align: center">Mã số BHXH</td>
+                        <td style="text-align: center">Họ tên</td>
+                        <td style="text-align: center">
+                          Trạng thái gửi HUỶ phê duyệt vào hệ thống
+                        </td>
+                        <td style="text-align: center">Lỗi (nếu có)</td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(item, index) in dulieuHuyPheDuyet"
+                        :key="index"
+                        style="font-size: small"
+                      >
+                        <td style="text-align: center; vertical-align: middle">
+                          {{ index + 1 }}
+                        </td>
+                        <td style="text-align: center; font-weight: 500">
+                          {{ item.masobhxh }}
+                        </td>
+                        <td style="font-weight: 500">
+                          {{ item.hoten }}
+                        </td>
+                        <td style="text-align: center">
+                          {{ item.status }}
+                        </td>
+                        <td style="text-align: center">
+                          {{ item.error }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </section>
           </div>
         </div>
@@ -632,6 +564,9 @@ export default {
 
       selectedItems: [], // chứa danh sách các dòng đã được chọn
       selectAll: false,
+
+      dulieuPheduyet: [],
+      dulieuHuyPheDuyet: [],
     };
   },
 
@@ -724,12 +659,27 @@ export default {
   },
 
   methods: {
+    // toggleAll() {
+    //   if (this.selectAll) {
+    //     // Lấy toàn bộ các dòng, không lọc gì nữa
+    //     this.selectedItems = [...this.data_kekhai];
+    //     // console.log(this.selectedItems);
+    //   } else {
+    //     this.selectedItems = [];
+    //   }
+    // },
+
     toggleAll() {
       if (this.selectAll) {
-        // Lấy toàn bộ các dòng, không lọc gì nữa
-        this.selectedItems = [...this.data_kekhai];
-        // console.log(this.selectedItems);
+        // Chỉ thêm các item thỏa điều kiện vào selectedItems
+        // console.log(typeof this.data_kekhai[0].trangthai);
+        // trangthai kiểu number còn status_naptien kiểu boolean
+
+        this.selectedItems = this.data_kekhai.filter(
+          (item) => item.status_naptien === false && item.trangthai === 0
+        );
       } else {
+        // Bỏ chọn tất cả
         this.selectedItems = [];
       }
     },
@@ -870,125 +820,6 @@ export default {
       // console.log(this.loaihinh);
     },
 
-    async guiDulieuLenCongBhxhvn(data) {
-      // console.log(data);
-      let matochucDvt = "";
-      if (data.maloaihinh == "AR") {
-        matochucDvt = "AR0013M";
-      } else if (data.maloaihinh == "BI") {
-        matochucDvt = "BI0007M";
-      } else {
-        matochucDvt = "IS0012M";
-      }
-
-      const dataPost = {
-        hosoIdentity: data.hosoIdentity,
-        maSoBhxh: data.masobhxh,
-        hoTen: data.hoten,
-        soCccd: data.cccd,
-        ngaySinh: data.ngaysinh,
-        gioiTinh: data.gioitinh,
-        loaiDt: data.tenloaihinh,
-        soTien: data.sotien,
-        soThang: data.maphuongthucdong,
-        maToChucDvt: matochucDvt,
-        tenToChucDvt: data.tentochuc,
-        maNhanVienThu: "NVT" + data.cccd,
-        tenNhanVienThu: this.user.name,
-        maCqBhxh: this.user.macqbhxh,
-        tenCqBhxh: this.user.tencqbhxh,
-        keyfrombhvn: data.key,
-        tuNgay: data.tungay,
-        denNgay: this.calculateEndDate(data.tungay, data.maphuongthucdong),
-        soHoSo: data.sohoso,
-        dotKeKhai: data.dotkekhai,
-        kyKeKhai: data.kykekhai,
-        ngayKeKhai: data.ngaykekhai,
-        createdBy: this.user.username,
-      };
-
-      // console.log(dataPost);
-
-      const result = await Swal.fire({
-        title: `Xác nhận gửi hồ sơ lên cổng BHXH VN ?`,
-        showDenyButton: true,
-        confirmButtonText: "Xác nhận",
-        denyButtonText: `Hủy`,
-      });
-      if (result.isConfirmed) {
-        // const url = '10.0.119.10:8186/dvtService/api/DVT/insertThongtin'
-        const url = `/api/kekhai/pushinfotoportbhxhvn`;
-
-        const headers = {
-          "Content-Type": "application/json",
-          Charset: "utf-8",
-        };
-
-        try {
-          const response = await this.$axios.post(url, dataPost, { headers });
-          // console.log(response);
-          // response.data.data
-          const resDatafromBHXHVN = {
-            maLoi: response.data.data.maLoi,
-            moTaLoi: response.data.data.moTaLoi,
-            maXacNhan: response.data.data.maXacNhan,
-            noiDung: response.data.data.noiDung,
-          };
-
-          // Kết hợp dataPost và resDatafromBHXHVN
-          const combinedData = {
-            ...dataPost,
-            ...resDatafromBHXHVN,
-          };
-
-          // console.log(combinedData);
-
-          if (response.data.data.maLoi == 0) {
-            const result = await this.$axios.post(
-              `/api/kekhai/saveresponsefrombhvntodb`,
-              combinedData
-            );
-            // console.log(result);
-            if (result.data.success == true) {
-              // Cập nhật trạng thái isSent
-              data.isSent = true;
-
-              const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener("mouseenter", Swal.stopTimer);
-                  toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-              });
-              Toast.fire({
-                icon: "success",
-                title: "Đã gửi thông tin hồ sơ lên cổng thành công",
-              });
-
-              // đổi trạng thái của hồ sơ trong kê khai
-              let bodyRes = {};
-              bodyRes = result.data.datares;
-              // console.log(bodyRes);
-              bodyRes._id = data._id;
-
-              const resUpdate = await this.$axios.post(
-                `/api/kekhai/updatestatushoso`,
-                bodyRes
-              );
-              // console.log(resUpdate);
-            }
-          }
-        } catch (error) {
-          console.error("Error posting data:", error);
-          throw error;
-        }
-      }
-    },
-
     async filterData(page) {
       // console.log(this.data_kekhai);
       // console.log(this.$auth.user);
@@ -1111,7 +942,7 @@ export default {
       }
 
       const result = await Swal.fire({
-        title: `Xác nhận gửi hồ sơ kê khai ?`,
+        title: `Xác nhận PHÊ duyệt hồ sơ ?`,
         showDenyButton: true,
         confirmButtonText: "Xác nhận",
         denyButtonText: `Hủy gửi`,
@@ -1161,9 +992,80 @@ export default {
         }
 
         // Hiển thị kết quả ra console (bạn có thể dùng để show lên modal)
-        console.table(ketquaTongHop);
+        this.dulieuPheduyet = ketquaTongHop;
+        this.dulieuHuyPheDuyet = []; // Reset dữ liệu huỷ phê duyệt
 
-        Swal.fire("Kết quả", "Xem kết quả trong console", "info");
+        this.isActive = true;
+      }
+    },
+
+    // HÀM HUỶ DUYỆT HỒ SƠ TRANGTHAI=1
+    async xacHUYNhanBienLai() {
+      if (!this.selectedItems || this.selectedItems.length === 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "Chưa chọn hồ sơ",
+          text: "Vui lòng chọn ít nhất một hồ sơ trước khi xác nhận.",
+        });
+        return;
+      }
+
+      const result = await Swal.fire({
+        title: `Xác nhận HUỶ phê duyệt hồ sơ?`,
+        showDenyButton: true,
+        confirmButtonText: "Xác nhận",
+        denyButtonText: `Hủy gửi`,
+      });
+
+      if (result.isConfirmed) {
+        let ketquaTongHop = [];
+
+        for (const item of this.selectedItems) {
+          try {
+            const res = await this.$axios.post(
+              "/api/kekhai/cancel-invoice-status",
+              {
+                _id: item._id,
+                hoten: item.hoten,
+                masobhxh: item.masobhxh,
+                hosoIdentity: item.hosoIdentity,
+              }
+            );
+
+            if (res.data.success) {
+              ketquaTongHop.push({
+                _id: res.data.data._id,
+                hoten: res.data.data.hoten,
+                masobhxh: res.data.data.masobhxh,
+                status: "✅ Thành công",
+                message: res.data.message,
+              });
+            } else {
+              ketquaTongHop.push({
+                _id: res.data.data._id,
+                hoten: res.data.data.hoten,
+                masobhxh: res.data.data.masobhxh,
+                status: "❌ Thất bại",
+                error: res.data.message,
+              });
+            }
+          } catch (error) {
+            ketquaTongHop.push({
+              _id: item._id,
+              hoten: item.hoten,
+              masobhxh: item.masobhxh,
+              status: "❌ Lỗi hệ thống",
+              error: error.response?.data?.message || error.message,
+            });
+          }
+        }
+
+        // Hiển thị kết quả ra console (bạn có thể dùng để show lên modal)
+        // console.table(ketquaTongHop);
+        this.dulieuHuyPheDuyet = ketquaTongHop;
+        this.dulieuPheduyet = []; // Reset dữ liệu phê duyệt
+
+        this.isActive_fix = true;
       }
     },
 

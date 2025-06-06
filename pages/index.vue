@@ -76,7 +76,106 @@
           </div>
         </div>
 
-        <div class="column is-2">
+        <div class="column">
+          <div class="box has-text-centered">
+            <div class="columns">
+              <div class="column">
+                <div class="box has-text-centered">
+                  <nuxt-link
+                    to="/nhanviendailythu/tongsokekhai"
+                    style="text-decoration: none"
+                  >
+                    <span
+                      style="
+                        font-size: 60px;
+                        font-weight: 700;
+                        font-family: 'Roboto', sans-serif;
+                        color: #0d6efd;
+                      "
+                    >
+                      {{ reportHoso.tong_hoso }}
+                    </span>
+                  </nuxt-link>
+
+                  <hr class="navbar-divider" />
+                  <span style="font-size: 15px; font-weight: 500"
+                    >Tổng số người đã kê khai</span
+                  >
+                </div>
+              </div>
+              <div class="column">
+                <div class="box has-text-centered">
+                  <nuxt-link
+                    to="/nhanviendailythu/hosoloibitrave"
+                    style="text-decoration: none"
+                  >
+                    <span
+                      style="
+                        font-size: 60px;
+                        font-weight: 700;
+                        font-family: 'Roboto', sans-serif;
+                        color: #198754;
+                      "
+                    >
+                      {{ reportHoso.hoso_dagui }}
+                    </span>
+                  </nuxt-link>
+                  <hr class="navbar-divider" />
+                  <span style="font-size: 15px; font-weight: 500"
+                    >Hồ sơ đã được DUYỆT</span
+                  >
+                </div>
+              </div>
+              <div class="column">
+                <div class="box has-text-centered">
+                  <nuxt-link
+                    to="/nhanviendailythu/hosochuaguilencong"
+                    style="text-decoration: none"
+                  >
+                    <span
+                      style="
+                        font-size: 60px;
+                        font-weight: 700;
+                        font-family: 'Roboto', sans-serif;
+                        color: #dc3545;
+                      "
+                    >
+                      {{ reportHoso.hoso_chuagui }}
+                    </span>
+                  </nuxt-link>
+
+                  <hr class="navbar-divider" />
+                  <span style="font-size: 15px; font-weight: 500"
+                    >Hồ sơ bị Huỷ duyệt</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="columns">
+              <div class="column">
+                <div class="box has-text-centered">
+                  <span
+                    style="
+                      font-size: 60px;
+                      font-weight: 700;
+                      font-family: 'Roboto', sans-serif;
+                      color: #6610f2;
+                    "
+                  >
+                    {{ reportHoso.tong_sotien | formatNumber }}
+                  </span>
+                  <hr class="navbar-divider" />
+                  <span style="font-size: 15px; font-weight: 500"
+                    >Tổng số tiền đã nạp lên</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- <div class="column is-2">
           <div class="box has-text-centered">
             <nuxt-link
               to="/nhanviendailythu/tongsokekhai"
@@ -131,33 +230,12 @@
                   color: #dc3545;
                 "
               >
-                {{ reportHoso.hoso_loi }}
-              </span>
-            </nuxt-link>
-            <hr class="navbar-divider" />
-            <span style="font-size: 15px; font-weight: 500"
-              >Tổng số kê khai lỗi</span
-            >
-          </div>
-          <div class="box has-text-centered">
-            <nuxt-link
-              to="/nhanviendailythu/hosodaguilencong"
-              style="text-decoration: none"
-            >
-              <span
-                style="
-                  font-size: 60px;
-                  font-weight: 700;
-                  font-family: 'Roboto', sans-serif;
-                  color: #198754;
-                "
-              >
                 {{ reportHoso.hoso_dagui }}
               </span>
             </nuxt-link>
             <hr class="navbar-divider" />
             <span style="font-size: 15px; font-weight: 500"
-              >Tổng số hồ sơ đã lên cổng</span
+              >Hồ sơ đã được DUYỆT</span
             >
           </div>
         </div>
@@ -182,7 +260,7 @@
 
             <hr class="navbar-divider" />
             <span style="font-size: 15px; font-weight: 500"
-              >Tổng kê khai chưa gửi lên cổng</span
+              >Hồ sơ bị Huỷ duyệt</span
             >
           </div>
           <div class="box has-text-centered">
@@ -201,7 +279,7 @@
               >Tổng số tiền thu</span
             >
           </div>
-        </div>
+        </div> -->
       </div>
 
       <div class="columns" style="padding-left: 50px; padding-right: 50px">

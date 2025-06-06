@@ -734,7 +734,7 @@ export default {
       if (this.selectAll) {
         // Lấy toàn bộ các dòng, không lọc gì nữa
         this.selectedItems = [...this.data_kekhai];
-        console.log(this.selectedItems);
+        // console.log(this.selectedItems);
       } else {
         this.selectedItems = [];
       }
