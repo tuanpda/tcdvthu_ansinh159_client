@@ -8,29 +8,10 @@
               <i class="far fa-calendar-alt"></i>
             </span>
             <span style="font-weight: bold; color: #198754"
-              >Tìm kiếm hồ sơ kê khai</span
+              >Xuất file dữ liệu đẩy IVAN</span
             >
           </div>
         </div>
-      </div>
-
-      <div v-if="listhsloi.length > 0" class="box">
-        <span style="font-weight: 600; color: red"
-          >Hiện điểm thu bạn đang có {{ listhsloi.length }} người kê khai lỗi bị
-          trả lại:</span
-        >
-        <ul>
-          <li
-            style="font-weight: 500; color: #198754"
-            v-for="(hoso, index) in listhsloi"
-            :key="index"
-          >
-            {{ index + 1 }}: Loại hình: {{ hoso.maloaihinh }}, Mã số BHXH:
-            {{ hoso.masobhxh }}, Họ tên: {{ hoso.hoten }}, Đợt Kê khai:
-            {{ hoso.dotkekhai }}, Kỳ kê khai: {{ hoso.kykekhai }}, Ngày kê khai:
-            {{ hoso.ngaykekhai }}
-          </li>
-        </ul>
       </div>
 
       <div class="box">
@@ -64,6 +45,9 @@
                 <option value="BI">Bảo hiểm y tế</option>
                 <option value="AR">Bảo hiểm y tế - HGĐ</option>
                 <option value="IS">Bảo hiểm xã hội tự nguyện</option>
+                <option value="IL">
+                  Người tham gia lực lượng An ninh cơ sở
+                </option>
               </select>
             </div>
           </div>

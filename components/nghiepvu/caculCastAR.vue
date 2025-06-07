@@ -85,9 +85,9 @@
                   </span>
                 </a>
                 &nbsp;
-                <a @click="refreshItem(item)">
+                <a @click="checkItem(item)">
                   <span class="icon is-small">
-                    <i style="color: #ffd863" class="fas fa-circle-notch"></i>
+                    <i style="color: #198754" class="fab fa-angellist"></i>
                   </span>
                 </a>
               </td>
@@ -354,6 +354,7 @@
                   <select
                     v-model="item.mabenhvien"
                     @change="hopChangeReset($event, index)"
+                    ref="hopInput"
                   >
                     <option
                       v-for="(nt, idx) in item.info_benhvien"
@@ -2192,6 +2193,30 @@ export default {
       }
     },
 
+    async checkItem() {
+      const isDataValid = await this.checkFormData();
+      if (!isDataValid) {
+        // Dừng quá trình lưu dữ liệu nếu dữ liệu không hợp lệ
+        return;
+      } else {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
+        Toast.fire({
+          icon: "success",
+          title: `Bản ghi đã đầy đủ dữ liệu!`,
+        });
+      }
+    },
+
     addHosokekhai() {
       this.addedIndex = 0; // là chỉ mục index của item hiện tại đang được nhập tại modal
       // Mở trạng thái nhập hồ sơ
@@ -2402,7 +2427,7 @@ export default {
           ngaykekhai: "",
           ngaybienlai: "",
           sobienlai: "",
-          trangthai: 1,
+          trangthai: 0,
 
           status_hosoloi: 0,
           status_naptien: 0,
@@ -2908,16 +2933,16 @@ export default {
         //   return false;
         // }
 
-        // if (!this.items[i].mabenhvien || !this.items[i].tenbenhvien) {
-        //   this.$toasted.show("Chọn bệnh viện", {
-        //     duration: 3000,
-        //     theme: "bubble",
-        //   });
-        //   if (this.$refs.hopInput[i]) {
-        //     this.$refs.hopInput[i].focus();
-        //   }
-        //   return false;
-        // }
+        if (!this.items[i].mabenhvien || !this.items[i].tenbenhvien) {
+          this.$toasted.show("Chọn bệnh viện", {
+            duration: 3000,
+            theme: "bubble",
+          });
+          if (this.$refs.hopInput[i]) {
+            this.$refs.hopInput[i].focus();
+          }
+          return false;
+        }
 
         if (!this.items[i].hinhthucnap) {
           this.$toasted.show("Chọn hình thức nạp tiền", {
@@ -3024,6 +3049,12 @@ export default {
       });
       if (result.isConfirmed) {
         this.isActive = false;
+      }
+    },
+
+    async onSave1() {
+      for (let i = 0; i < this.items.length; i++) {
+        const rs = await this.$axios.post("/api/kekhai/tao-bienlai", items[i]);
       }
     },
 
@@ -3334,7 +3365,7 @@ export default {
       doc.setFont("OpenSans-Bold", "bold");
       doc.setFontSize(12);
       doc.setTextColor("#04368c");
-      doc.text(`BẢO HIỂM XÃ HỘI HUYỆN CẨM XUYÊN`, 60, 10, {
+      doc.text(`BẢO HIỂM XÃ HỘI THỊ XÃ KỲ ANH`, 60, 10, {
         align: "center",
         fontWeight: "bold",
       });
@@ -3394,7 +3425,7 @@ export default {
       doc.setFontSize(9);
       doc.setTextColor("#00008b");
       doc.text(
-        `Do ASXH Phủ Diễn tổ chức được Bảo hiểm xã hội uỷ quyền thu phát hành. `,
+        `Do Công ty TNHH 159, tổ chức được Bảo hiểm xã hội uỷ quyền thu phát hành. `,
         105,
         41,
         {
@@ -3528,14 +3559,27 @@ export default {
         fontWeight: "bold",
       });
 
+      // doc.addFont(
+      //   "OpenSans-Regular-normal.ttf",
+      //   "OpenSans-Regular-normal",
+      //   "bold"
+      // );
+      // doc.setFont("OpenSans-Regular-normal", "bold");
+      // doc.setFontSize(12);
+      // doc.setTextColor("#dc143c");
+
       doc.addFont(
-        "OpenSans-Regular-normal.ttf",
-        "OpenSans-Regular-normal",
+        "OpenSans-ExtraBold-normal.ttf",
+        "OpenSans-ExtraBold-normal",
         "bold"
       );
-      doc.setFont("OpenSans-Regular-normal", "bold");
-      doc.setFontSize(12);
-      doc.setTextColor("#dc143c");
+      doc.setFont("OpenSans-ExtraBold-normal", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor("#04368c");
+      doc.text(`${data.hoTen}`, toadoXInfo + 40, toadoYInfo + 75, {
+        fontWeight: "bold",
+        align: "center",
+      });
 
       // doc.text(
       //   `Ký bởi: CÔNG TY TNHH ASXH PHỦ DIỄN`,
@@ -3562,14 +3606,12 @@ export default {
       doc.setFont("OpenSans-ExtraBold-normal", "bold");
       doc.setFontSize(11);
       doc.setTextColor("#04368c");
-      doc.text(
-        `Nhân viên thu: ${this.user.name}`,
-        toadoXInfo + 99,
-        toadoYInfo + 75,
-        {
-          fontWeight: "bold",
-        }
-      );
+
+      // Tâm mong muốn theo trục X
+      const centerX = toadoXInfo + 128;
+      doc.text(`${this.user.name}`, centerX + 11, toadoYInfo + 75, {
+        align: "center",
+      });
 
       // doc.addFont(
       //   "OpenSans_SemiCondensed-Italic-normal.ttf",

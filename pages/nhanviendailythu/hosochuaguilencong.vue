@@ -8,7 +8,7 @@
               <i class="far fa-calendar-alt"></i>
             </span>
             <span style="font-weight: bold; color: #198754"
-              >Hồ sơ chưa gửi lên cổng BHXH VN</span
+              >Hồ sơ chưa DUYỆT</span
             >
           </div>
         </div>
@@ -23,7 +23,6 @@
               <tr style="font-size: small; background-color: #faf0e6">
                 <td rowspan="2" style="text-align: center; width: 3%">STT</td>
                 <td rowspan="2" style="text-align: center">_ID</td>
-                <td style="text-align: center">Trạng thái</td>
                 <td rowspan="2" style="text-align: center">Số hồ sơ</td>
                 <td rowspan="2" style="text-align: center">Mã đại lý</td>
                 <td rowspan="2" style="text-align: center">Tên đại lý</td>
@@ -53,23 +52,6 @@
               >
                 <td style="text-align: center">{{ index + 1 }}</td>
                 <td style="">{{ item._id }}</td>
-                <td style="text-align: center">
-                  <template v-if="item.trangthai == 0"
-                    ><span style="font-weight: 700; color: #00947e"
-                      >Đã lên cổng</span
-                    ></template
-                  >
-                  <template v-else-if="item.status_hosoloi == 1">
-                    <span style="font-weight: 800; color: red"
-                      >Hồ sơ bị trả</span
-                    >
-                  </template>
-                  <template v-else="item.status_hosoloi == 1">
-                    <span style="font-weight: 800; color: #6f42c1"
-                      >Chưa đẩy</span
-                    >
-                  </template>
-                </td>
 
                 <td
                   style="text-align: center; font-weight: 700; color: chocolate"

@@ -98,7 +98,7 @@
                   </nuxt-link>
 
                   <hr class="navbar-divider" />
-                  <span style="font-size: 15px; font-weight: 500"
+                  <span style="font-size: 15px; font-weight: 700"
                     >Tổng số người đã kê khai</span
                   >
                 </div>
@@ -106,7 +106,7 @@
               <div class="column">
                 <div class="box has-text-centered">
                   <nuxt-link
-                    to="/nhanviendailythu/hosoloibitrave"
+                    to="/nhanviendailythu/hosodaguilencong"
                     style="text-decoration: none"
                   >
                     <span
@@ -121,7 +121,7 @@
                     </span>
                   </nuxt-link>
                   <hr class="navbar-divider" />
-                  <span style="font-size: 15px; font-weight: 500"
+                  <span style="font-size: 15px; font-weight: 700"
                     >Hồ sơ đã được DUYỆT</span
                   >
                 </div>
@@ -137,15 +137,38 @@
                         font-size: 60px;
                         font-weight: 700;
                         font-family: 'Roboto', sans-serif;
-                        color: #dc3545;
+                        color: #ffc107;
                       "
                     >
                       {{ reportHoso.hoso_chuagui }}
                     </span>
                   </nuxt-link>
+                  <hr class="navbar-divider" />
+                  <span style="font-size: 15px; font-weight: 700"
+                    >Hồ sơ chưa DUYỆT</span
+                  >
+                </div>
+              </div>
+              <div class="column">
+                <div class="box has-text-centered">
+                  <nuxt-link
+                    to="/nhanviendailythu/hosoloibitrave"
+                    style="text-decoration: none"
+                  >
+                    <span
+                      style="
+                        font-size: 60px;
+                        font-weight: 700;
+                        font-family: 'Roboto', sans-serif;
+                        color: #dc3545;
+                      "
+                    >
+                      {{ reportHoso.hoso_loi }}
+                    </span>
+                  </nuxt-link>
 
                   <hr class="navbar-divider" />
-                  <span style="font-size: 15px; font-weight: 500"
+                  <span style="font-size: 15px; font-weight: 700"
                     >Hồ sơ bị Huỷ duyệt</span
                   >
                 </div>
@@ -166,7 +189,7 @@
                     {{ reportHoso.tong_sotien | formatNumber }}
                   </span>
                   <hr class="navbar-divider" />
-                  <span style="font-size: 15px; font-weight: 500"
+                  <span style="font-size: 15px; font-weight: 700"
                     >Tổng số tiền đã nạp lên</span
                   >
                 </div>

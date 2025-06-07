@@ -14,25 +14,6 @@
         </div>
       </div>
 
-      <div v-if="listhsloi.length > 0" class="box">
-        <span style="font-weight: 600; color: red"
-          >Hiện điểm thu bạn đang có {{ listhsloi.length }} người kê khai lỗi bị
-          trả lại:</span
-        >
-        <ul>
-          <li
-            style="font-weight: 500; color: #198754"
-            v-for="(hoso, index) in listhsloi"
-            :key="index"
-          >
-            {{ index + 1 }}: Loại hình: {{ hoso.maloaihinh }}, Mã số BHXH:
-            {{ hoso.masobhxh }}, Họ tên: {{ hoso.hoten }}, Đợt Kê khai:
-            {{ hoso.dotkekhai }}, Kỳ kê khai: {{ hoso.kykekhai }}, Ngày kê khai:
-            {{ hoso.ngaykekhai }}
-          </li>
-        </ul>
-      </div>
-
       <div class="box">
         <div class="columns">
           <!-- <div class="column">
@@ -65,6 +46,9 @@
                 <option value="BI">Bảo hiểm y tế</option>
                 <option value="AR">Bảo hiểm y tế - HGĐ</option>
                 <option value="IS">Bảo hiểm xã hội tự nguyện</option>
+                <option value="IL">
+                  Người tham gia lực lượng An ninh cơ sở
+                </option>
               </select>
             </div>
           </div>
@@ -157,7 +141,11 @@
               <span>Tìm kiếm hồ sơ</span>
             </button>
 
-            <button @click="xacNhanBienLai()" class="button is-small is-danger">
+            <button
+              :disabled="user.role !== 2"
+              @click="xacNhanBienLai()"
+              class="button is-small is-danger"
+            >
               <span class="icon">
                 <i class="fab fa-amazon-pay"></i>
               </span>
@@ -165,6 +153,7 @@
             </button>
 
             <button
+              :disabled="user.role !== 2"
               @click="xacHUYNhanBienLai()"
               class="button is-small is-warning"
             >
@@ -174,8 +163,8 @@
               <span>HUỶ duyệt hồ sơ</span>
             </button>
 
-            <ExportExcel_Viettel :data_execl="data_kekhai" />
-            <ExportExcel_Vnpt :data_execl="data_kekhai" />
+            <!-- <ExportExcel_Viettel :data_execl="data_kekhai" />
+            <ExportExcel_Vnpt :data_execl="data_kekhai" /> -->
           </div>
         </footer>
       </div>
@@ -847,7 +836,7 @@ export default {
           // );
           // tạm thời bỏ điểm thu ra code ngày 07/5/2025
           const res = await this.$axios.get(
-            `/api/kekhai/kykekhai-search-hoso-daguilencong?kykekhai=${this.kykekhai}&dotkekhai=${this.dotkekhai}&ngaykekhai=${this.ngaykekhaitu}&ngaykekhaiden=${this.ngaykekhaiden}&sohoso=${this.sohoso}&masobhxh=${this.masobhxh}&hoten=${this.hoten}&maloaihinh=${this.maloaihinh}&page=${page}`
+            `/api/kekhai/kykekhai-search-hoso?kykekhai=${this.kykekhai}&dotkekhai=${this.dotkekhai}&ngaykekhai=${this.ngaykekhaitu}&ngaykekhaiden=${this.ngaykekhaiden}&sohoso=${this.sohoso}&masobhxh=${this.masobhxh}&hoten=${this.hoten}&maloaihinh=${this.maloaihinh}&page=${page}`
           );
           // console.log(res);
           if (res.data.results.length > 0) {
@@ -893,7 +882,7 @@ export default {
       } else {
         try {
           const res = await this.$axios.get(
-            `/api/kekhai/kykekhai-search-hoso-diemthu-daguilencong?kykekhai=${this.kykekhai}&dotkekhai=${this.dotkekhai}&ngaykekhai=${this.ngaykekhaitu}&ngaykekhaiden=${this.ngaykekhaiden}&sohoso=${this.sohoso}&masobhxh=${this.masobhxh}&hoten=${this.hoten}&madaily=${this.madaily}&maloaihinh=${this.maloaihinh}&page=${page}`
+            `/api/kekhai/kykekhai-search-hoso-diemthu?kykekhai=${this.kykekhai}&dotkekhai=${this.dotkekhai}&ngaykekhai=${this.ngaykekhaitu}&ngaykekhaiden=${this.ngaykekhaiden}&sohoso=${this.sohoso}&masobhxh=${this.masobhxh}&hoten=${this.hoten}&madaily=${this.madaily}&maloaihinh=${this.maloaihinh}&page=${page}`
           );
           if (res.data.results.length > 0) {
             this.data_kekhai = res.data.results;
