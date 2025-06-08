@@ -41,7 +41,7 @@
               <td style="text-align: center">Điện thoại</td>
               <td style="text-align: center">Phương án</td>
               <td style="text-align: center">Mức tiền đóng</td>
-              <td style="text-align: center">Từ tháng</td>
+              <td style="text-align: center">Hạn thẻ cũ</td>
               <td style="text-align: center">Đối tượng đóng</td>
               <td style="text-align: center">Số tháng</td>
               <td
@@ -81,7 +81,7 @@
                 &nbsp;
                 <a @click="checkItem(item)">
                   <span class="icon is-small">
-                    <i style="color: #ffd863" class="fas fa-circle-notch"></i>
+                    <i style="color: #198754" class="fab fa-angellist"></i>
                   </span>
                 </a>
               </td>
@@ -180,8 +180,7 @@
 
               <td style="text-align: center">
                 <input
-                  v-model="item.tuthang"
-                  @blur="validateMonthYear(item.tuthang, index)"
+                  v-model="hanthecu"
                   type="text"
                   placeholder="MM/YYYY"
                   class="input is-small"
@@ -1026,18 +1025,12 @@
                 </div>
                 <div class="column">
                   <div style="margin-bottom: 5px">
-                    <label class="labelFix">Từ tháng</label>
+                    <label class="labelFix">Hạn thẻ cũ</label>
                   </div>
                   <div>
                     <td style="text-align: center">
                       <input
-                        v-model="datanhaphosomodal.tuthang"
-                        @blur="
-                          validateMonthYear(
-                            datanhaphosomodal.tuthang,
-                            addedIndex
-                          )
-                        "
+                        v-model="hanthecu"
                         type="text"
                         placeholder="MM/YYYY"
                         class="input is-small"
@@ -1461,8 +1454,9 @@
           <section class="modal-card-kekhai-body">
             <div>
               <div>
-                <span style="font-weight: 800; font-size: 15px; color: #3cb371"
-                  >Xem lại và xác nhận gửi bộ hồ sơ kê khai</span
+                <span style="font-weight: 800; font-size: 15px; color: red"
+                  >Xác nhận và xem biên lai (Bắt buộc bấm xác nhận để lưu trữ
+                  biên lai điện tử vào dữ liệu)</span
                 >
               </div>
               <div style="text-align: end"></div>
@@ -1483,35 +1477,40 @@
                   <thead style="font-weight: bold">
                     <tr style="font-size: small; background-color: #fff8dc">
                       <td style="text-align: center; width: 3%">STT</td>
+                      <td style="text-align: center">Biên lai</td>
+                      <td style="text-align: center">Số biên lai</td>
                       <td style="text-align: center">Mã số BHXH</td>
                       <td style="text-align: center">Họ tên</td>
                       <td style="text-align: center">Ngày sinh</td>
                       <td style="text-align: center">Giới tính</td>
                       <td style="text-align: center">CCCD</td>
                       <td style="text-align: center">Điện thoại</td>
-                      <td style="text-align: center">Phương án</td>
-                      <td style="text-align: center">Mức lương đóng</td>
-                      <td style="text-align: center">Từ tháng</td>
-                      <td style="text-align: center">Đối tượng đóng</td>
-                      <td style="text-align: center">Số tháng</td>
-                      <td style="text-align: center">Số tiền phải đóng</td>
-                      <td style="text-align: center">Tỉnh / Thành phố</td>
-                      <td style="text-align: center">Quận / Huyện</td>
-                      <td style="text-align: center">Xã phường</td>
-                      <td style="text-align: center">Tổ thôn</td>
-                      <td style="text-align: center">Ghi chú</td>
-                      <td style="text-align: center">Số biên lai</td>
-                      <td style="text-align: center">Ngày biên lai</td>
+                      <td style="text-align: center">Loại hình</td>
+                      <td style="text-align: center">Số tiền</td>
+                      <td style="text-align: center">Số tháng đóng</td>
                     </tr>
                   </thead>
                   <tbody>
                     <tr
-                      v-for="(item, index) in items"
+                      v-for="(item, index) in dulieuTravedeinbienlai"
                       :key="index"
                       style="font-size: small"
                     >
                       <td style="text-align: center; vertical-align: middle">
                         {{ index + 1 }}
+                      </td>
+                      <td style="text-align: center">
+                        <a @click="xemBienLai(item)">
+                          <span
+                            style="color: #ff69b4"
+                            class="icon is-small is-left"
+                          >
+                            <i class="fas fa-print"></i>
+                          </span>
+                        </a>
+                      </td>
+                      <td style="text-align: center; font-weight: 500">
+                        {{ item.sobienlai }}
                       </td>
                       <td style="text-align: center; font-weight: 500">
                         {{ item.masobhxh }}
@@ -1520,15 +1519,10 @@
                         {{ item.hoten }}
                       </td>
                       <td style="text-align: center">
-                        {{ formatISODateToDMY(item.ngaysinh) }}
+                        {{ item.ngaysinh }}
                       </td>
                       <td style="text-align: center">
-                        <template v-if="item.gioitinh == 0">
-                          <span>Nữ</span>
-                        </template>
-                        <template v-else>
-                          <span>Nam</span>
-                        </template>
+                        {{ item.gioitinh }}
                       </td>
                       <td style="text-align: center; font-weight: 500">
                         {{ item.cccd }}
@@ -1537,51 +1531,13 @@
                         {{ item.dienthoai }}
                       </td>
                       <td style="text-align: center">
-                        {{ item.tenphuongan }}
+                        {{ item.maloaihinh }}
                       </td>
                       <td style="text-align: center">
-                        {{ formatCurrency(item.muctiendong) }}
-                      </td>
-                      <td style="text-align: center">
-                        {{ item.tuthang }}
-                      </td>
-                      <td style="text-align: center">
-                        {{ item.tendoituong }}
+                        {{ item.sotien }}
                       </td>
                       <td style="text-align: center">
                         {{ item.tenphuongthucdong }}
-                      </td>
-                      <td
-                        style="text-align: center; font-weight: 500; color: red"
-                      >
-                        {{ formatCurrency(item.sotien) }}
-                      </td>
-                      <!-- tỉnh-->
-                      <td style="text-align: center">
-                        {{ item.tentinh }}
-                      </td>
-                      <!-- quận huyện -->
-                      <td style="text-align: center">
-                        {{ item.tenquanhuyen }}
-                      </td>
-                      <!-- xã phường -->
-                      <td>
-                        {{ item.tenxaphuong }}
-                      </td>
-                      <!-- tổ thôn -->
-                      <td>
-                        {{ item.tothon }}
-                      </td>
-                      <!-- ghi chú -->
-                      <td>
-                        {{ item.ghichu }}
-                      </td>
-                      <!-- biên lai -->
-                      <td style="text-align: center">
-                        {{ item.sobienlai }}
-                      </td>
-                      <td style="text-align: center">
-                        {{ formatISODateToDMY(item.ngaybienlai) }}
                       </td>
                     </tr>
                   </tbody>
@@ -1607,16 +1563,17 @@
                       <button
                         @click="onSave"
                         class="button is-success is-small"
+                        :disabled="lockButtonXacnhaninbldt"
                       >
-                        Xác nhận nạp hồ sơ
+                        Xác nhận biên lai
                       </button>
                     </div>
                     <div class="control">
                       <button
-                        @click="isActive_xacnhan = false"
+                        @click="hoanTatDongHs"
                         class="button is-warning is-light is-small"
                       >
-                        Hủy xác nhận
+                        Đóng
                       </button>
                     </div>
                   </div>
@@ -1754,6 +1711,9 @@ export default {
       NCT: false,
 
       hanthecu: "",
+      dulieuInbienlai: [],
+      dulieuTravedeinbienlai: [],
+      lockButtonXacnhaninbldt: false, // khóa nút xác nhận biên lai khi đã gửi
     };
   },
 
@@ -1994,7 +1954,7 @@ export default {
             // console.log(resHGD);
             if (resHGD.data.success == 1) {
               soCmnd_hgd = resHGD.data.data[0].soCmnd;
-              console.log(resHGD);
+              // console.log(resHGD);
             }
 
             try {
@@ -2027,6 +1987,10 @@ export default {
               // Định dạng lại chuỗi theo MM/YYYY
               const hantheMoi = `${thang.toString().padStart(2, "0")}/${nam}`;
               this.items[index].tuthang = hantheMoi; // gán hạn thẻ mới vào ô từ tháng
+              // console.log(
+              //   "🎯 Hạn thẻ mới (tuthang):",
+              //   this.items[index].tuthang
+              // );
 
               this.items[index].muctiendong = data.mucDong;
               // this.items[index].maphuongthucdong = data.phuongthuc;
@@ -2234,11 +2198,328 @@ export default {
       }
     },
 
-    async guiKekhai() {
-      // console.log(this.items);
+    async onSave() {
+      // đoạn này theo code mới là sẽ bấm để lưu dữ liệu biên lai
+      // Kiểm tra dữ liệu trước khi ghi
+      // console.log(this.dulieuTravedeinbienlai);
+      const isDataValid = await this.checkFormData();
+      if (!isDataValid) {
+        // Dừng quá trình lưu dữ liệu nếu dữ liệu không hợp lệ
+        return;
+      }
 
+      const result = await Swal.fire({
+        title: `Xác nhận biên lai điện tử?`,
+        showDenyButton: true,
+        confirmButtonText: "Xác nhận",
+        denyButtonText: `Hủy gửi`,
+      });
+      if (result.isConfirmed) {
+        // console.log(this.items);
+
+        // const current = new Date();
+        const nowInVietnam = DateTime.now().setZone("Asia/Ho_Chi_Minh");
+        const formattedDate = nowInVietnam.toFormat("dd-MM-yyyy HH:mm:ss");
+        try {
+          // Bắt đầu hiển thị biểu tượng loading
+          this.isLoading = true;
+          // thông tin biên lai
+          const currentYear = new Date().getFullYear();
+
+          // lấy tên biên lai để lưu
+          for (let i = 0; i < this.dulieuTravedeinbienlai.length; i++) {
+            const item = this.dulieuTravedeinbienlai[i];
+
+            const formattedForFilename = formattedDate.replace(/[-: ]/g, "_");
+            const urlNameInvoice = `${item.hosoIdentity}_${formattedForFilename}_${item.sobienlai}_${item.hoten}`;
+
+            const dataPost = {
+              hosoIdentity: item.hosoIdentity,
+              maSoBhxh: item.masobhxh,
+              hoTen: item.hoten,
+              soCccd: item.cccd,
+              ngaySinh: item.ngaysinh,
+              gioiTinh: item.gioitinh,
+              soDienThoai: item.dienthoai,
+              nguoithutien: item.tennguoitao,
+              loaiDt: item.tenloaihinh,
+              soTien: item.sotien,
+              soThang: item.maphuongthucdong,
+              tuNgay: item.tungay,
+              denNgay: item.denngay,
+              tuThang: item.tuthang,
+              denThang: item.denthang,
+              maDaiLy: item.madaily,
+              tenDaiLy: item.tendaily,
+              createdBy: this.user.username,
+              sobienlai: item.sobienlai,
+              ngaybienlai: formattedDate,
+              maloaihinh: item.maloaihinh,
+              tothon: item.tothon,
+              tenquanhuyen: item.tenquanhuyen,
+              tentinh: item.tentinh,
+              currentYear: currentYear,
+              urlNameInvoice: urlNameInvoice,
+            };
+
+            const ghibienlai = await this.$axios.post(
+              `/api/kekhai/ghidulieubienlai`,
+              dataPost
+            );
+
+            // lưu biên lai vào máy chủ
+            await this.inBienLaiDientu(dataPost);
+            // console.log("xongbienlai");
+          }
+
+          const hosoIds = this.dulieuTravedeinbienlai.map(
+            (item) => item.hosoIdentity
+          );
+
+          const rsIdtity = await this.$axios.post(
+            `/api/kekhai/getdskekhaiwithhsidentity`,
+            hosoIds
+          );
+          this.dulieuTravedeinbienlai = rsIdtity.data;
+          this.isLoading = false;
+          this.lockButtonXacnhaninbldt = true; // khoá nút xác nhận biên lai điện tử
+
+          Swal.fire({
+            title: "Hoàn tất xác nhận toàn bộ hồ sơ!",
+            icon: "success",
+          });
+          // console.log("check hàm xem biên lai:", this.xemBienLai);
+        } catch (error) {
+          // console.log(error);
+          this.isLoading = false;
+        }
+      }
+    },
+
+    async guiKekhai() {
+      // console.log(this.items[0].tuthang);
+      // trên data tạo ra 1 mảng dữ liệu để lưu thông tin sau gọi in biên lai
+      this.dulieuInbienlai = [];
       if (this.items.length > 0) {
-        this.isActive_xacnhan = true;
+        // console.log(this.items);
+        if (this.items.length <= 0) {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener("mouseenter", Swal.stopTimer);
+              toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+          });
+          Toast.fire({
+            icon: "error",
+            title: "Chưa có bản ghi nào !",
+          });
+          return;
+        } else {
+          // Kiểm tra dữ liệu trước khi ghi
+          const isDataValid = await this.checkFormData();
+          if (!isDataValid) {
+            // Dừng quá trình lưu dữ liệu nếu dữ liệu không hợp lệ
+            return;
+          }
+
+          const result = await Swal.fire({
+            title: `Xác nhận gửi hồ sơ kê khai ?`,
+            showDenyButton: true,
+            confirmButtonText: "Xác nhận",
+            denyButtonText: `Hủy gửi`,
+          });
+          if (result.isConfirmed) {
+            // console.log(this.items);
+
+            // const current = new Date();
+            const nowInVietnam = DateTime.now().setZone("Asia/Ho_Chi_Minh");
+            const formattedDate = nowInVietnam.toFormat("dd-MM-yyyy HH:mm:ss");
+            const kyKeKhaiFrm = nowInVietnam.toFormat("MM/yyyy");
+            // Bắt đầu hiển thị biểu tượng loading
+            this.isLoading = true;
+            let dataKekhai = [];
+            // console.log("test1");
+
+            try {
+              for (let i = 0; i < this.items.length; i++) {
+                this.items[i].sotien = this.items[i].sotien.replace(/,/g, "");
+
+                this.items[i].muctiendong = this.items[i].muctiendong.replace(
+                  /,/g,
+                  ""
+                );
+
+                this.items[i].denthang = this.tinhDenThang(
+                  this.items[i].tuthang,
+                  this.items[i].maphuongthucdong
+                );
+
+                // console.log(this.items[i].denthang);
+
+                this.items[i].tennguoitao = this.user.name;
+
+                // ngày biên lai
+                // const ngaybienlaiTranform = this.convertDate(
+                //   this.items[i].ngaybienlai
+                // );
+                // this.items[i].ngaybienlai = ngaybienlaiTranform;
+
+                // info add db
+                this.items[i].createdAt = formattedDate;
+                this.items[i].createdBy = this.user.username;
+                this.items[i].updatedAt = "";
+                this.items[i].updatedBy = "";
+
+                // **** thêm các thông tin để gửi dữ liệu lên cổng tiếp nhận BHXH VN
+                // số tiền, số tháng kiểu float và kiểu int cho từng loại
+                // mã tổ chức dịch vụ thu cho công ty an sinh hưng nguyên
+                // IS0104S: BHXH tự nguyện
+                // IL0001S: Lực lượng tham gia bảo vệ ANTT ở cơ sở
+                // BI0099S: BHYT Hộ gia đình
+                // AR0099S: BHYT HGĐ làm nông lâm ngư Nghiệp
+                // Vậy đối với AR thì mã TCDV thu là: AR0099S
+
+                // mã tổ chức dịch vụ thu cho công ty An sinh 159
+                // BI0214M	Tổ chức dịch vụ thu BHYT HGĐ - Công ty TNHH An Sinh 159
+                // AR0212M	Tổ chức dịch vụ thu BHYT HGĐ có MSTB - Công ty TNHH An Sinh 159
+                // IS0212M	Tổ chức dịch vụ thu BHXH TN - Công ty TNHH An Sinh 159
+
+                let maToChucDvt = "IS0212M";
+                let soTien = this.items[i].sotien;
+                let soThang = this.items[i].maphuongthucdong;
+                let maNhanVienThu = "NVT" + this.user.cccd;
+                let tenNhanVienThu = this.user.name;
+                let maCqBhxh = this.user.macqbhxh;
+                let tenCqBhxh = this.user.tencqbhxh;
+                let key = "0123"; // do bhxh vn cung cấp
+                let tuNgay = this.items[i].tuthang;
+                let denNgay = this.tinhDenThang(tuNgay, soThang);
+
+                // thông tin bộ hồ sơ nạp
+                this.items[i].nvt_masobhxh = this.user.masobhxh;
+                this.items[i].nvt_cccd = this.user.cccd;
+                this.items[i].kykekhai = kyKeKhaiFrm;
+                this.items[i].ngaykekhai = formattedDate;
+
+                const uniqueString = this.generateUniqueString();
+                this.items[i].hosoIdentity =
+                  uniqueString +
+                  this.items[i].masobhxh +
+                  this.items[i].cccd +
+                  this.user.username;
+                // Loại bỏ dữ liệu không cần thiết bằng destructuring
+                const {
+                  info_benhvien,
+                  info_huyen,
+                  info_phuongan,
+                  info_tinh,
+                  info_xaphuong,
+                  phuongthucdong,
+                  ...filteredItem
+                } = this.items[i];
+
+                // Thêm vào mảng mới
+                // Tạo một đối tượng chứa các phần khai báo mới
+                const additionalData = {
+                  maToChucDvt,
+                  soTien,
+                  soThang,
+                  maNhanVienThu,
+                  tenNhanVienThu,
+                  maCqBhxh,
+                  tenCqBhxh,
+                  key,
+                  tuNgay,
+                  denNgay,
+                };
+
+                // Thêm cả filteredItem và additionalData vào mảng dataKekhai
+                dataKekhai.push({
+                  ...filteredItem,
+                  ...additionalData,
+                });
+
+                // thông tin biên lai
+                const currentYear = new Date().getFullYear();
+
+                // lấy tên biên lai để lưu
+                const formattedForFilename = formattedDate.replace(
+                  /[-: ]/g,
+                  "_"
+                );
+                // console.log(formattedForFilename);
+
+                const urlNameInvoice = `${this.items[i].hosoIdentity}_${formattedForFilename}_${this.items[i].hoten}`;
+                // console.log(urlNameInvoice);
+
+                const dataPost = {
+                  hosoIdentity: this.items[i].hosoIdentity,
+                  maSoBhxh: this.items[i].masobhxh,
+                  hoTen: this.items[i].hoten,
+                  soCccd: this.items[i].cccd,
+                  ngaySinh: this.items[i].ngaysinh,
+                  gioiTinh: this.items[i].gioitinh,
+                  soDienThoai: this.items[i].dienthoai,
+                  nguoithutien: this.items[i].tennguoitao,
+                  loaiDt: this.items[i].tenloaihinh,
+                  soTien: this.items[i].sotien,
+                  soThang: this.items[i].maphuongthucdong,
+                  tuNgay: this.items[i].tungay,
+                  denNgay: this.items[i].denngay,
+                  tuThang: this.items[i].tuthang,
+                  denThang: this.items[i].denthang,
+                  maDaiLy: this.items[i].madaily,
+                  tenDaiLy: this.items[i].tendaily,
+                  createdBy: this.user.username,
+                  sobienlai: "",
+                  ngaybienlai: formattedDate,
+                  maloaihinh: this.items[i].maloaihinh,
+                  tothon: this.items[i].tothon,
+                  tenquanhuyen: this.items[i].tenquanhuyen,
+                  tentinh: this.items[i].tentinh,
+                  currentYear: currentYear,
+                  urlNameInvoice: urlNameInvoice,
+                };
+
+                this.dulieuInbienlai.push(dataPost);
+              }
+
+              // console.log(dataKekhai);
+
+              const result = await this.$axios.post(
+                `/api/kekhai/add-kekhai-series`,
+                dataKekhai
+              );
+
+              if (result.status === 200) {
+                this.isLoading = false;
+                // Đợi 300ms trước khi gọi tiếp (đảm bảo DB đã xử lý xong)
+                await new Promise((resolve) => setTimeout(resolve, 300));
+
+                const hosoIds = this.dulieuInbienlai.map(
+                  (item) => item.hosoIdentity
+                );
+
+                const rsIdtity = await this.$axios.post(
+                  `/api/kekhai/getdskekhaiwithhsidentity`,
+                  hosoIds
+                );
+
+                // console.log(rsIdtity.data);
+                this.dulieuTravedeinbienlai = rsIdtity.data;
+                this.isActive_xacnhan = true;
+              }
+            } catch (error) {
+              // console.log(error);
+              this.isLoading = false;
+            }
+          }
+        }
       } else {
         const Toast = Swal.mixin({
           toast: true,
@@ -2254,6 +2535,44 @@ export default {
         Toast.fire({
           icon: "error",
           title: "Không có hồ sơ nào để xác nhận",
+        });
+      }
+    },
+
+    async xemBienLai(item) {
+      // console.log(item.hosoIdentity);
+
+      try {
+        const res = await this.$axios.get(
+          `/api/kekhai/view-item-bienlai?hosoIdentity=${item.hosoIdentity}`
+        );
+
+        // console.log(res);
+
+        const hs = res.data.hs;
+        if (hs && hs.urlNameInvoice) {
+          const fileName = `${hs.sobienlai}_${encodeURIComponent(
+            hs.hoten
+          )}.pdf`;
+          const pdfUrl = `http://14.224.129.177:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          // const pdfUrl = `http://localhost:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          // console.log(pdfUrl);
+
+          window.open(pdfUrl, "_blank");
+        } else {
+          console.warn("Thiếu thông tin số biên lai hoặc họ tên!");
+          this.$swal.fire({
+            icon: "error",
+            title: "Lỗi",
+            text: "Không lấy được thông tin biên lai.",
+          });
+        }
+      } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
+        this.$swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: "Không thể kết nối đến máy chủ.",
         });
       }
     },
@@ -2394,6 +2713,14 @@ export default {
       } else {
         return isoDateString;
       }
+    },
+
+    hoanTatDongHs() {
+      // console.log("hoantatdong");
+      this.items = [];
+      this.dulieuTravedeinbienlai = [];
+      this.dulieuInbienlai = [];
+      this.isActive_xacnhan = false;
     },
 
     limitTiendong(cast, index) {
@@ -3878,7 +4205,7 @@ export default {
       }
     },
 
-    async onSave() {
+    async onSave1() {
       const matochuc = this.user.matochuc;
       const parts = matochuc.split("-");
       const mst = parts[parts.length - 1];
@@ -4041,7 +4368,7 @@ export default {
               // console.log(formattedForFilename);
 
               const urlNameInvoice = `${this.items[i].hosoIdentity}_${formattedForFilename}_${this.items[i].hoten}`;
-              console.log(urlNameInvoice);
+              // console.log(urlNameInvoice);
 
               const dataPost = {
                 hosoIdentity: this.items[i].hosoIdentity,
@@ -4072,7 +4399,7 @@ export default {
                 urlNameInvoice: urlNameInvoice,
               };
 
-              console.log(dataPost);
+              // console.log(dataPost);
 
               const ghibienlai = await this.$axios.post(
                 `/api/kekhai/ghidulieubienlai`,
@@ -4081,7 +4408,7 @@ export default {
 
               // lưu biên lai vào máy chủ
               await this.inBienLaiDientu(dataPost);
-              console.log("xongbienlai");
+              // console.log("xongbienlai");
             }
 
             const result = await this.$axios.post(
@@ -4107,6 +4434,7 @@ export default {
         }
       }
     },
+
     async inBienLaiDientu(data) {
       // console.log(data);
 
@@ -4370,22 +4698,24 @@ export default {
         align: "center",
       });
 
-      // doc.text(
-      //   `Ký bởi: CÔNG TY TNHH ASXH PHỦ DIỄN`,
-      //   toadoXInfo + 100,
-      //   toadoYInfo + 53,
-      //   {
-      //     fontWeight: "bold",
-      //   }
-      // );
-      // doc.text(
-      //   `Ngày ký: 18/12/2024 15:15:09`,
-      //   toadoXInfo + 110,
-      //   toadoYInfo + 58,
-      //   {
-      //     fontWeight: "bold",
-      //   }
-      // );
+      doc.setFontSize(10);
+      doc.setTextColor("#dc3545");
+      doc.text(
+        `Đã được ký bởi: CÔNG TY TNHH AN SINH 159`,
+        toadoXInfo + 100,
+        toadoYInfo + 53,
+        {
+          fontWeight: "bold",
+        }
+      );
+      doc.text(
+        `Ngày ký: ${data.ngaybienlai}`,
+        toadoXInfo + 110,
+        toadoYInfo + 58,
+        {
+          fontWeight: "bold",
+        }
+      );
 
       doc.addFont(
         "OpenSans-ExtraBold-normal.ttf",
