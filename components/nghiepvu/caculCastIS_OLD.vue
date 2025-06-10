@@ -25,7 +25,6 @@
           </div>
         </div>
       </div>
-
       <div class="table_wrapper">
         <table
           class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
@@ -222,6 +221,24 @@
                     </select>
                   </div>
                 </td>
+                <!-- <td v-else style="text-align: center">
+                  <div class="select is-fullwidth is-small">
+                    <select
+                      v-model="item.madoituong"
+                      @change="doituongChange($event, index)"
+                      ref="doituongSelect"
+                    >
+                      <option selected disabled>- Chọn đối tượng đóng -</option>
+                      <option
+                        v-for="(dt, index) in item.doituong"
+                        :key="index"
+                        :value="dt.madoituong"
+                      >
+                        {{ dt.tendoituong }}
+                      </option>
+                    </select>
+                  </div>
+                </td> -->
               </template>
 
               <!-- nếu đóng bù -->
@@ -229,7 +246,7 @@
                 <td style="text-align: center">
                   <div class="select is-fullwidth is-small">
                     <select
-                      @change="phuongthucdChangeDongbu($event, index)"
+                      @change="phuongthucdChangeDongbu($event, addedIndex)"
                       ref="phuongthucdongSelect"
                     >
                       <option selected disabled>
@@ -467,7 +484,6 @@
           </tbody>
         </table>
       </div>
-
       <div class="button-container">
         <!-- Các nút thêm dòng và gửi kê khai -->
         <button @click="addRow" class="button is-info is-small">
@@ -1043,10 +1059,7 @@
                   </div>
                 </template>
                 <template v-else>
-                  <div
-                    class="column"
-                    v-if="checkDong1lanchocacnamvesauVaConthieu == false"
-                  >
+                  <div class="column">
                     <div style="margin-bottom: 5px">
                       <label class="labelFix">Đối tượng đóng</label>
                     </div>
@@ -1071,7 +1084,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="column" v-else>
+                  <!-- <div class="column" v-else>
                     <div style="margin-bottom: 5px">
                       <label class="labelFix">Đối tượng đóng</label>
                     </div>
@@ -1095,7 +1108,7 @@
                         </select>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                 </template>
               </div>
 
@@ -1687,7 +1700,7 @@ export default {
       NVS: false,
       NCT: false,
 
-      hanthecu: "",
+      hanthecu: "", // hạn thẻ cũ
       dulieuInbienlai: [],
       dulieuTravedeinbienlai: [],
       lockButtonXacnhaninbldt: false, // khóa nút xác nhận biên lai khi đã gửi
@@ -1962,10 +1975,6 @@ export default {
               // Định dạng lại chuỗi theo MM/YYYY
               const hantheMoi = `${thang.toString().padStart(2, "0")}/${nam}`;
               this.items[index].tuthang = hantheMoi; // gán hạn thẻ mới vào ô từ tháng
-              // console.log(
-              //   "🎯 Hạn thẻ mới (tuthang):",
-              //   this.items[index].tuthang
-              // );
 
               this.items[index].muctiendong = data.mucDong;
               // this.items[index].maphuongthucdong = data.phuongthuc;
@@ -2160,6 +2169,14 @@ export default {
       }
     },
 
+    hoanTatDongHs() {
+      // console.log("hoantatdong");
+      this.items = [];
+      this.dulieuTravedeinbienlai = [];
+      this.dulieuInbienlai = [];
+      this.isActive_xacnhan = false;
+    },
+
     async cancelNhaphoso() {
       const result = await Swal.fire({
         title: `Xác nhận hủy kê khai hồ sơ ?`,
@@ -2170,104 +2187,6 @@ export default {
       if (result.isConfirmed) {
         this.items.splice(this.addedIndex, 1);
         this.isActive_nhaphoso = false;
-      }
-    },
-
-    async onSave() {
-      // đoạn này theo code mới là sẽ bấm để lưu dữ liệu biên lai
-      // Kiểm tra dữ liệu trước khi ghi
-      // console.log(this.dulieuTravedeinbienlai);
-      const isDataValid = await this.checkFormData();
-      if (!isDataValid) {
-        // Dừng quá trình lưu dữ liệu nếu dữ liệu không hợp lệ
-        return;
-      }
-
-      const result = await Swal.fire({
-        title: `Xác nhận biên lai điện tử?`,
-        showDenyButton: true,
-        confirmButtonText: "Xác nhận",
-        denyButtonText: `Hủy gửi`,
-      });
-      if (result.isConfirmed) {
-        // console.log(this.items);
-
-        // const current = new Date();
-        const nowInVietnam = DateTime.now().setZone("Asia/Ho_Chi_Minh");
-        const formattedDate = nowInVietnam.toFormat("dd-MM-yyyy HH:mm:ss");
-        try {
-          // Bắt đầu hiển thị biểu tượng loading
-          this.isLoading = true;
-          // thông tin biên lai
-          const currentYear = new Date().getFullYear();
-
-          // lấy tên biên lai để lưu
-          for (let i = 0; i < this.dulieuTravedeinbienlai.length; i++) {
-            const item = this.dulieuTravedeinbienlai[i];
-
-            const formattedForFilename = formattedDate.replace(/[-: ]/g, "_");
-            const urlNameInvoice = `${item.hosoIdentity}_${formattedForFilename}_${item.sobienlai}_${item.hoten}`;
-
-            const dataPost = {
-              hosoIdentity: item.hosoIdentity,
-              maSoBhxh: item.masobhxh,
-              hoTen: item.hoten,
-              soCccd: item.cccd,
-              ngaySinh: item.ngaysinh,
-              gioiTinh: item.gioitinh,
-              soDienThoai: item.dienthoai,
-              nguoithutien: item.tennguoitao,
-              loaiDt: item.tenloaihinh,
-              soTien: item.sotien,
-              soThang: item.maphuongthucdong,
-              tuNgay: item.tungay,
-              denNgay: item.denngay,
-              tuThang: item.tuthang,
-              denThang: item.denthang,
-              maDaiLy: item.madaily,
-              tenDaiLy: item.tendaily,
-              createdBy: this.user.username,
-              sobienlai: item.sobienlai,
-              ngaybienlai: formattedDate,
-              maloaihinh: item.maloaihinh,
-              tothon: item.tothon,
-              tenquanhuyen: item.tenquanhuyen,
-              tentinh: item.tentinh,
-              currentYear: currentYear,
-              urlNameInvoice: urlNameInvoice,
-            };
-
-            const ghibienlai = await this.$axios.post(
-              `/api/kekhai/ghidulieubienlai`,
-              dataPost
-            );
-
-            // lưu biên lai vào máy chủ
-            await this.inBienLaiDientu(dataPost);
-            // console.log("xongbienlai");
-          }
-
-          const hosoIds = this.dulieuTravedeinbienlai.map(
-            (item) => item.hosoIdentity
-          );
-
-          const rsIdtity = await this.$axios.post(
-            `/api/kekhai/getdskekhaiwithhsidentity`,
-            hosoIds
-          );
-          this.dulieuTravedeinbienlai = rsIdtity.data;
-          this.isLoading = false;
-          this.lockButtonXacnhaninbldt = true; // khoá nút xác nhận biên lai điện tử
-
-          Swal.fire({
-            title: "Hoàn tất xác nhận toàn bộ hồ sơ!",
-            icon: "success",
-          });
-          // console.log("check hàm xem biên lai:", this.xemBienLai);
-        } catch (error) {
-          // console.log(error);
-          this.isLoading = false;
-        }
       }
     },
 
@@ -2690,14 +2609,6 @@ export default {
       }
     },
 
-    hoanTatDongHs() {
-      // console.log("hoantatdong");
-      this.items = [];
-      this.dulieuTravedeinbienlai = [];
-      this.dulieuInbienlai = [];
-      this.isActive_xacnhan = false;
-    },
-
     limitTiendong(cast, index) {
       let castInput = cast.toString().replace(/,/g, "");
       const minInput = this.chuanngheo;
@@ -2892,8 +2803,7 @@ export default {
       const castSubTwhotro = this.chuanngheo * tyleDong;
 
       // Tìm tỷ lệ hỗ trợ trung ương theo mã đối tượng
-      // cho vào danh mục tỷ lệ đóng của IL là 30 45 50
-      const doituong = this.doituongdongil.find(
+      const doituong = this.doituongdong.find(
         (d) => d.madoituong === madoituong
       );
       const tyleHotroTW = doituong ? doituong.tylehotro : 0;
@@ -2901,12 +2811,40 @@ export default {
 
       let tienCanNap = 0;
 
-      // const castDiaphuonght =
-      //   this.chuanngheo * tyleDong * (this.tylediaphuonghotroIs / 100);
-      // const castDiaphuonghtKhac =
-      //   this.chuanngheo * tyleDong * (this.tylehotrokhacIs / 100);
+      if (thangNgoai2025 === 0) {
+        // ✅ Trường hợp chỉ trong năm 2025
+        const castDiaphuonght =
+          this.chuanngheo * tyleDong * (this.tylediaphuonghotroIs / 100);
+        const castDiaphuonghtKhac =
+          this.chuanngheo * tyleDong * (this.tylehotrokhacIs / 100);
 
-      tienCanNap = (castMucdong - hotroTW) * parseFloat(maphuongthucdong);
+        tienCanNap =
+          (castMucdong - hotroTW - castDiaphuonght - castDiaphuonghtKhac) *
+          parseFloat(maphuongthucdong);
+      } else {
+        // ✅ Trường hợp có tháng ngoài 2025
+        // Trong năm 2025: hỗ trợ địa phương = 20%
+        const castDiaphuonght_2025 =
+          this.chuanngheo * tyleDong * (this.tylediaphuonghotroIs / 100);
+        const castDiaphuonghtKhac =
+          this.chuanngheo * tyleDong * (this.tylehotrokhacIs / 100);
+
+        const tienTrong2025 =
+          (castMucdong - hotroTW - castDiaphuonght_2025 - castDiaphuonghtKhac) *
+          thangTrong2025;
+
+        const tienNgoai2025 =
+          (castMucdong - hotroTW - 0 - castDiaphuonghtKhac) * thangNgoai2025;
+        // tức là đoạn này cho phép là this.tylediaphuonghotroIs = 0 (không còn được hỗ trợ)
+        // khi nào cần điều chỉnh thì chỉnh
+
+        // console.log(this.tylediaphuonghotroIs);
+
+        // console.log(tienTrong2025);
+        // console.log(tienNgoai2025);
+
+        tienCanNap = tienTrong2025 + tienNgoai2025;
+      }
 
       // console.log("Tiền cần nạp:", tienCanNap);
       return tienCanNap;
@@ -3200,6 +3138,20 @@ export default {
 
       const madoituong = this.items[index].madoituong;
 
+      if (maphuongthucdong == "D1LNCT" || maphuongthucdong == "D1LNVS") {
+        this.checkDong1lanchocacnamvesauVaConthieu = true;
+        if (maphuongthucdong == "D1LNCT") {
+          this.NCT = true;
+          this.NVS = false;
+        }
+        if (maphuongthucdong == "D1LNVS") {
+          this.NVS = true;
+          this.NCT = false;
+        }
+      } else {
+        this.checkDong1lanchocacnamvesauVaConthieu = false;
+      }
+
       const muctiendong = parseFloat(
         this.items[index].muctiendong.replace(/,/g, "")
       );
@@ -3382,19 +3334,24 @@ export default {
       const maphuongthucdong = e.target.value;
       const tenphuongthucdong = e.target.options[e.target.selectedIndex].text;
       // console.log(maphuongthucdong);
-      // console.log(tenphuongthucdong);
+      // console.log(this.items[index].maphuongthucdong);
 
       this.items[index].maphuongthucdong = maphuongthucdong;
       this.items[index].tenphuongthucdong = tenphuongthucdong;
       this.items[index].sothang = 0;
 
-      if (maphuongthucdong == "D1LNCT") {
-        this.NCT = true;
-        this.NVS = false;
-      }
-      if (maphuongthucdong == "D1LNVS") {
-        this.NVS = true;
-        this.NCT = false;
+      if (maphuongthucdong == "D1LNCT" || maphuongthucdong == "D1LNVS") {
+        this.checkDong1lanchocacnamvesauVaConthieu = true;
+        if (maphuongthucdong == "D1LNCT") {
+          this.NCT = true;
+          this.NVS = false;
+        }
+        if (maphuongthucdong == "D1LNVS") {
+          this.NVS = true;
+          this.NCT = false;
+        }
+      } else {
+        this.checkDong1lanchocacnamvesauVaConthieu = false;
       }
     },
 
@@ -4044,6 +4001,104 @@ export default {
       }
     },
 
+    async onSave() {
+      // đoạn này theo code mới là sẽ bấm để lưu dữ liệu biên lai
+      // Kiểm tra dữ liệu trước khi ghi
+      // console.log(this.dulieuTravedeinbienlai);
+      const isDataValid = await this.checkFormData();
+      if (!isDataValid) {
+        // Dừng quá trình lưu dữ liệu nếu dữ liệu không hợp lệ
+        return;
+      }
+
+      const result = await Swal.fire({
+        title: `Xác nhận biên lai điện tử?`,
+        showDenyButton: true,
+        confirmButtonText: "Xác nhận",
+        denyButtonText: `Hủy gửi`,
+      });
+      if (result.isConfirmed) {
+        // console.log(this.items);
+
+        // const current = new Date();
+        const nowInVietnam = DateTime.now().setZone("Asia/Ho_Chi_Minh");
+        const formattedDate = nowInVietnam.toFormat("dd-MM-yyyy HH:mm:ss");
+        try {
+          // Bắt đầu hiển thị biểu tượng loading
+          this.isLoading = true;
+          // thông tin biên lai
+          const currentYear = new Date().getFullYear();
+
+          // lấy tên biên lai để lưu
+          for (let i = 0; i < this.dulieuTravedeinbienlai.length; i++) {
+            const item = this.dulieuTravedeinbienlai[i];
+
+            const formattedForFilename = formattedDate.replace(/[-: ]/g, "_");
+            const urlNameInvoice = `${item.hosoIdentity}_${formattedForFilename}_${item.sobienlai}_${item.hoten}`;
+
+            const dataPost = {
+              hosoIdentity: item.hosoIdentity,
+              maSoBhxh: item.masobhxh,
+              hoTen: item.hoten,
+              soCccd: item.cccd,
+              ngaySinh: item.ngaysinh,
+              gioiTinh: item.gioitinh,
+              soDienThoai: item.dienthoai,
+              nguoithutien: item.tennguoitao,
+              loaiDt: item.tenloaihinh,
+              soTien: item.sotien,
+              soThang: item.maphuongthucdong,
+              tuNgay: item.tungay,
+              denNgay: item.denngay,
+              tuThang: item.tuthang,
+              denThang: item.denthang,
+              maDaiLy: item.madaily,
+              tenDaiLy: item.tendaily,
+              createdBy: this.user.username,
+              sobienlai: item.sobienlai,
+              ngaybienlai: formattedDate,
+              maloaihinh: item.maloaihinh,
+              tothon: item.tothon,
+              tenquanhuyen: item.tenquanhuyen,
+              tentinh: item.tentinh,
+              currentYear: currentYear,
+              urlNameInvoice: urlNameInvoice,
+            };
+
+            const ghibienlai = await this.$axios.post(
+              `/api/kekhai/ghidulieubienlai`,
+              dataPost
+            );
+
+            // lưu biên lai vào máy chủ
+            await this.inBienLaiDientu(dataPost);
+            // console.log("xongbienlai");
+          }
+
+          const hosoIds = this.dulieuTravedeinbienlai.map(
+            (item) => item.hosoIdentity
+          );
+
+          const rsIdtity = await this.$axios.post(
+            `/api/kekhai/getdskekhaiwithhsidentity`,
+            hosoIds
+          );
+          this.dulieuTravedeinbienlai = rsIdtity.data;
+          this.isLoading = false;
+          this.lockButtonXacnhaninbldt = true; // khoá nút xác nhận biên lai điện tử
+
+          Swal.fire({
+            title: "Hoàn tất xác nhận toàn bộ hồ sơ!",
+            icon: "success",
+          });
+          // console.log("check hàm xem biên lai:", this.xemBienLai);
+        } catch (error) {
+          // console.log(error);
+          this.isLoading = false;
+        }
+      }
+    },
+
     async onSave1() {
       const matochuc = this.user.matochuc;
       const parts = matochuc.split("-");
@@ -4249,6 +4304,8 @@ export default {
               await this.inBienLaiDientu(dataPost);
               // console.log("xongbienlai");
             }
+
+            // console.log(dataKekhai);
 
             const result = await this.$axios.post(
               `/api/kekhai/add-kekhai-series`,
