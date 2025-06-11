@@ -1865,6 +1865,9 @@ export default {
           // const res = await this.$axios.get(
           //   `/api/nguoihuong/find-nguoihuong-masobhxh-theodstg?soBhxh=${masobhxh}`
           // );
+
+          // mai code lại đoạn này. nếu tìm thấy trong dulieu thẻ thì ok lấy.
+          // nếu không tìm trong dữ liệu hosocanhan
           const res = await this.$axios.get(
             `/api/nguoihuong/find-nguoihuong-masobhxh-theodstg-timhanthe?soSoBhxh=${masobhxh}`
           );
@@ -1903,7 +1906,7 @@ export default {
               this.items[index].hoten = data.hoTen;
               this.items[index].ngaysinh = data.ngaySinh;
               // console.log(typeof data.gioiTinh);
-              this.items[index].cccd = soCmnd_hgd;
+              this.items[index].cccd = data.SO_DDCN_CCCD_BCA;
               if (data.gioiTinh == "1") {
                 this.items[index].gioitinh = "Nam";
               } else {
