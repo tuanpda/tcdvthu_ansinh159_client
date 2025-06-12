@@ -2325,15 +2325,6 @@ export default {
         return false;
       }
 
-      if (!item.tungay) {
-        this.$toasted.show("Thiếu từ ngày", {
-          duration: 3000,
-          theme: "bubble",
-        });
-        this.$refs.tungayInput[index]?.focus();
-        return false;
-      }
-
       if (!item.maphuongthucdong || !item.tenphuongthucdong) {
         this.$toasted.show("Thiếu phương thức đóng", {
           duration: 3000,
