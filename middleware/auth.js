@@ -6,7 +6,7 @@ export default async function ({ store, redirect, req, app, route }) {
   // console.log('Middleware chạy ở:', process.server ? 'Server' : 'Client');
 
   // Những route không cần login
-  const publicRoutes = ["/tracuubienlaidientu-ansinh68"];
+  const publicRoutes = ["/tracuubienlaidientu-ansinh159"];
 
   if (publicRoutes.includes(route.path)) {
     // Bỏ qua kiểm tra login cho route này
