@@ -23,7 +23,7 @@
               type="text"
               class="input is-small"
               placeholder="Nhập vào mã số BHXH cần tìm kiếm"
-              @keyup.enter="findHanthe()"
+              @keyup.enter="searchHgd()"
             />
           </div>
           <div class="column">
@@ -33,14 +33,14 @@
               type="text"
               class="input is-small"
               placeholder="Nhập Căn cước công dân cần tìm kiếm"
-              @keyup.enter="findHanthe()"
+              @keyup.enter="searchHgd()"
             />
           </div>
         </div>
         <div class="columns"></div>
         <hr class="navbar-divider" />
         <footer class="has-text-right">
-          <button @click="findHanthe(1)" class="button is-success is-small">
+          <button @click="searchHgd()" class="button is-success is-small">
             <span class="icon">
               <i class="fas fa-search"></i>
             </span>
@@ -72,7 +72,6 @@
                   <td style="text-align: center">Số CCCD</td>
                   <td style="text-align: center">Mã đối tượng</td>
                   <td style="text-align: center">Hạn thẻ</td>
-                  <td style="text-align: center">Ghi chú</td>
                 </tr>
               </thead>
               <tbody>
@@ -106,9 +105,6 @@
                   </td>
                   <td style="text-align: center; font-size: small">
                     {{ dulieuHscn.hanThe }}
-                  </td>
-                  <td style="text-align: left; font-size: small">
-                    {{ dulieuHscn.ghiChu }}
                   </td>
                 </tr>
               </tbody>
@@ -145,7 +141,6 @@
                   <td style="text-align: center">Số CCCD</td>
                   <td style="text-align: center">Mã đối tượng</td>
                   <td style="text-align: center">Hạn thẻ</td>
-                  <td style="text-align: center">Ghi chú</td>
                 </tr>
               </thead>
               <tbody>
@@ -168,7 +163,6 @@
                     {{ item.maDoiTuongDangTg }}
                   </td>
                   <td style="text-align: left">{{ item.hanThe }}</td>
-                  <td style="text-align: left">{{ item.ghiChu }}</td>
                 </tr>
               </tbody>
             </table>
@@ -237,7 +231,7 @@ export default {
   },
 
   methods: {
-    async findHanthe() {
+    async searchHgd() {
       if (this.soBhxh === "" && this.SO_DDCN_CCCD_BCA === "") {
         const Toast = Swal.mixin({
           toast: true,
@@ -260,7 +254,7 @@ export default {
       try {
         this.isLoading = true;
         const res = await this.$axios.get(
-          `/api/nguoihuong/tim-kiem-thong-tin-hgd?&soBhxh=${this.soBhxh}&SO_DDCN_CCCD_BCA=${this.SO_DDCN_CCCD_BCA}`
+          `/api/nguoihuong/tim-kiem-thong-tin-hgd?soBhxh=${this.soBhxh}&SO_DDCN_CCCD_BCA=${this.SO_DDCN_CCCD_BCA}`
         );
         // console.log(res);
         if (res.data.canhan !== null) {
