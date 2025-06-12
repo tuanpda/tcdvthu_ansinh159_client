@@ -2104,6 +2104,80 @@ export default {
       }
     },
 
+    async findNguoihuongTest(masobhxh, index) {
+      // 2. Trường hợp không có trong dữ liệu thẻ thì đi tìm trong DL HGD
+      const resHGD = await this.$axios.get(
+        `/api/nguoihuong/tim-kiem-thong-tin-hgd?soBhxh=${masobhxh}&SO_DDCN_CCCD_BCA=''`
+      );
+      // console.log(resHGD);
+      if (resHGD.data.canhan !== null) {
+        // console.log(resHGD);
+        this.isLoading = false;
+        const data = resHGD.data.canhan;
+        try {
+          this.items[index].hoten = data.hoTen;
+          this.items[index].ngaysinh = data.ngaySinh;
+          // console.log(typeof data.gioiTinh);
+          this.items[index].cccd = data.SO_DDCN_CCCD_BCA;
+          this.items[index].gioitinh = data.gioiTinh;
+          this.items[index].dienthoai = data.soDienThoai;
+
+          const today = new Date();
+          const thang = String(today.getMonth() + 1).padStart(2, "0"); // tháng bắt đầu từ 0
+          const nam = today.getFullYear();
+
+          const thangNam = `${thang}/${nam}`;
+          // console.log(thangNam); // Ví dụ: "06/2025"
+          this.items[index].tuthang = thangNam;
+
+          const filename = data.tenFile;
+          const parts = filename.split("_");
+
+          const maTinh = parts[4].replace("TTT", "");
+          const maHuyen = parts[5].replace("HH", "");
+          const maXa = parts[6];
+
+          // console.log("Mã tỉnh:", maTinh); // "42"
+          // console.log("Mã huyện:", maHuyen); // "449"
+          // console.log("Mã xã:", maXa); // "18754"
+
+          this.items[index].matinh = maTinh;
+          // đi tìm tên tỉnh
+          const res_tinh = await this.$axios.get(
+            `/api/nguoihuong/find-tentinh?matinh=42`
+          );
+          if (res_tinh.data.length > 0) {
+            this.items[index].tentinh = res_tinh.data[0].tentinh;
+            // console.log(this.items[index].tentinh);
+          }
+          this.items[index].maquanhuyen = maHuyen;
+          // đi tìm tên quận huyện
+          const res_huyen = await this.$axios.get(
+            `/api/nguoihuong/find-tenhuyen?matinh=${maTinh}&maquanhuyen=${maHuyen}`
+          );
+          if (res_huyen.data.length > 0) {
+            this.items[index].tenquanhuyen = res_huyen.data[0].tenquanhuyen;
+            // console.log(this.items[index].tenquanhuyen);
+          }
+          this.items[index].maxaphuong = maXa;
+          // đi tìm tên xã
+          const res_xa = await this.$axios.get(
+            `/api/nguoihuong/find-tenxa?matinh=${maTinh}&maquanhuyen=${maHuyen}&maxaphuong=${maXa}`
+          );
+          // console.log(res_xa);
+
+          if (res_xa.data.length > 0) {
+            this.items[index].tenxaphuong = res_xa.data[0].tenxaphuong;
+            // console.log(this.items[index].tenxaphuong);
+          }
+          this.items[index].tothon = data.diaChi;
+          this.items[index].benhvientinh = maTinh;
+        } catch (error) {
+          console.log(error.message);
+        }
+      }
+    },
+
     async findNguoihuong(masobhxh, index) {
       if (masobhxh !== "") {
         const isDuplicate = this.items.some(
@@ -2245,12 +2319,26 @@ export default {
                 this.items[index].gioitinh = data.gioiTinh;
                 this.items[index].dienthoai = data.soDienThoai;
 
-                // console.log(data.hanThe);
-                // if(data.hanThe !== ''){
-                //   this.items[index].matinh = dateRange.split("-")[1]; // Kết quả: "31/12/2025"
-                // }
+                const today = new Date();
+                const thang = String(today.getMonth() + 1).padStart(2, "0"); // tháng bắt đầu từ 0
+                const nam = today.getFullYear();
 
-                this.items[index].matinh = data.maTinhLh;
+                const thangNam = `${thang}/${nam}`;
+                // console.log(thangNam); // Ví dụ: "06/2025"
+                this.items[index].tuthang = thangNam;
+
+                const filename = data.tenFile;
+                const parts = filename.split("_");
+
+                const maTinh = parts[4].replace("TTT", "");
+                const maHuyen = parts[5].replace("HH", "");
+                const maXa = parts[6];
+
+                // console.log("Mã tỉnh:", maTinh); // "42"
+                // console.log("Mã huyện:", maHuyen); // "449"
+                // console.log("Mã xã:", maXa); // "18754"
+
+                this.items[index].matinh = maTinh;
                 // đi tìm tên tỉnh
                 const res_tinh = await this.$axios.get(
                   `/api/nguoihuong/find-tentinh?matinh=42`
@@ -2259,8 +2347,29 @@ export default {
                   this.items[index].tentinh = res_tinh.data[0].tentinh;
                   // console.log(this.items[index].tentinh);
                 }
+                this.items[index].maquanhuyen = maHuyen;
+                // đi tìm tên quận huyện
+                const res_huyen = await this.$axios.get(
+                  `/api/nguoihuong/find-tenhuyen?matinh=${maTinh}&maquanhuyen=${maHuyen}`
+                );
+                if (res_huyen.data.length > 0) {
+                  this.items[index].tenquanhuyen =
+                    res_huyen.data[0].tenquanhuyen;
+                  // console.log(this.items[index].tenquanhuyen);
+                }
+                this.items[index].maxaphuong = maXa;
+                // đi tìm tên xã
+                const res_xa = await this.$axios.get(
+                  `/api/nguoihuong/find-tenxa?matinh=${maTinh}&maquanhuyen=${maHuyen}&maxaphuong=${maXa}`
+                );
+                // console.log(res_xa);
 
+                if (res_xa.data.length > 0) {
+                  this.items[index].tenxaphuong = res_xa.data[0].tenxaphuong;
+                  // console.log(this.items[index].tenxaphuong);
+                }
                 this.items[index].tothon = data.diaChi;
+                this.items[index].benhvientinh = maTinh;
               } catch (error) {
                 console.log(error.message);
               }
@@ -2784,6 +2893,7 @@ export default {
     },
 
     addRow() {
+      this.lockButtonXacnhaninbldt = false;
       const now = new Date();
       const currentMonthYear = `${String(now.getMonth() + 1).padStart(
         2,
