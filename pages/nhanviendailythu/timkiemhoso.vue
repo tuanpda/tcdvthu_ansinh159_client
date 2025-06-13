@@ -577,6 +577,7 @@ export default {
 
       dulieuPheduyet: [],
       dulieuHuyPheDuyet: [],
+      isLoading: false,
     };
   },
 
