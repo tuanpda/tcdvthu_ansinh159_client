@@ -953,7 +953,7 @@ export default {
 
       if (result.isConfirmed) {
         let ketquaTongHop = [];
-
+        this.isLoading = true;
         for (const item of this.selectedItems) {
           try {
             const res = await this.$axios.post(
@@ -996,6 +996,7 @@ export default {
 
         // Hiển thị kết quả ra console (bạn có thể dùng để show lên modal)
         this.dulieuPheduyet = ketquaTongHop;
+        this.isLoading = false;
         this.isActive = true;
       }
     },
@@ -1105,6 +1106,7 @@ export default {
         // console.log("Lý do hủy duyệt:", lyDo);
 
         let ketquaTongHop = [];
+        this.isLoading = true;
 
         for (const item of this.selectedItems) {
           try {
@@ -1153,7 +1155,7 @@ export default {
         // console.table(ketquaTongHop);
         this.dulieuHuyPheDuyet = ketquaTongHop;
         this.dulieuPheduyet = []; // Reset dữ liệu phê duyệt
-
+        this.isLoading = false;
         this.isActive_fix = true;
       }
     },
