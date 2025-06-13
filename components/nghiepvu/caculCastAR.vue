@@ -1975,7 +1975,7 @@ export default {
             this.items[index].tenxaphuong = res_xa.data[0].tenxaphuong;
             // console.log(this.items[index].tenxaphuong);
           }
-          this.items[index].tothon = data.diaChi;
+          this.items[index].tothon = dataHgd.diaChi;
           this.items[index].benhvientinh = maTinh;
         } catch (error) {
           console.log(error.message);
